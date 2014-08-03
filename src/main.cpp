@@ -37,8 +37,8 @@ int main(int argc, char* argv[])
         exit(EXIT_FAILURE);
     }
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     window = glfwCreateWindow(800, 600, "Camo-Generator", NULL, NULL);
     if (!window) {
         glfwTerminate();
@@ -52,6 +52,7 @@ int main(int argc, char* argv[])
     int major, minor, revision;
     glfwGetVersion(&major, &minor, &revision);
     std::cout << "Using OpenGL " << major << "." << minor << "." << revision << std::endl;
+    std::cout << "Is OpenGL 4.3 supported?" << (gl3wIsSupported(4,3) ? " yes" : " no") << std::endl;
 
     glfwMakeContextCurrent(window);
     glfwSetKeyCallback(window, key_callback);
