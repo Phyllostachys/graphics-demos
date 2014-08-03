@@ -1,5 +1,4 @@
 # Compiled Object files
-bin
 bin/*
 *.slo
 *.lo
