@@ -16,7 +16,6 @@ SOURCE = $(SRC_DIR)/gl3w.c $(SRC_DIR)/main.cpp $(SRC_DIR)/shader_util.cpp
 OBJECTS = $(OBJ_DIR)/gl3w.o $(OBJ_DIR)/main.o $(OBJ_DIR)/shader_util.o
 EXECUTABLE = $(OBJ_DIR)/camo-generator
 
-.PHONY: all
 all: $(OBJECTS) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
@@ -30,22 +29,20 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 $(OBJ_DIR)/gl3w.o: $(SRC_DIR)/gl3w.c
 	$(CC) $(CFLAGS) $(INC_DIR) -c -o $@ $<
 
-.PHONY: init
 init:
 	mkdir bin
 
-.PHONY: format
 format:
 	astyle -A10SNYpHUk1W3OcnrQz1 *.h
 	astyle -A10SNYpHUk1W3OcnrQz1 *.c
 	astyle -A10SNYpHUk1W3OcnrQz1 *.cpp
 
-.PHONY: clean
 clean:
 	rm -rf $(OBJECTS)
 
-.PHONY: dist-clean
 dist-clean: clean
 	rm -rf vert_shader.vert
 	rm -rf frag_shader.frag
 	rm -rf $(EXECUTABLE)
+
+.PHONY: init format clean dist-clean
