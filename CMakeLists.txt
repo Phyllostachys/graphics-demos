@@ -3,4 +3,4 @@ project(camo-generator)
 
 include_directories(include src)
 
-add_executable(camo-generator main.cpp)
+add_executable(camo-generator src/main.cpp)
