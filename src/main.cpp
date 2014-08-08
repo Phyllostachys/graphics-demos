@@ -42,23 +42,62 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     }
 }
 
+static int32_t searchForSimilar(int32_t x, int32_t y, uint8_t color)
+{
+    int32_t result = 0;
+
+    // top
+    if (board[y - 1][x - 1] == color) { result++; }
+    if (board[y - 1][x] == color) { result++; }
+    if (board[y - 1][x + 1] == color) { result++; }
+
+    // left and right
+    if (board[y][x - 1] == color) { result++; }
+    if (board[y][x + 1] == color) { result++; }
+
+    // bottom
+    if (board[y + 1][x - 1] == color) { result++; }
+    if (board[y + 1][x] == color) { result++; }
+    if (board[y + 1][x - 1] == color) { result++; }
+
+    return result;
+}
+
+static uint8_t sampleFanbase(int32_t x, int32_t y, uint8_t color)
+{
+    int32_t bl = 0, br = 0, gr = 0;
+
+    switch (color) {
+        case pxl_black:
+            break;
+        case pxl_green:
+            break;
+        case pxl_brown:
+            break;
+        default:
+            break;
+    }
+
+    return pxl_black;
+}
+
 int main(int argc, char* argv[])
 {
     // init data
     srand(time(NULL));
 
-    int randColor;
+    int32_t randColor;
     std::ofstream ofs;
     ofs.open("initial_colors.ppm", std::ofstream::out | std::ofstream::app);
     ofs << ppm_header;
 
     // generate data
-    for(int y = 600; y > 0; y--) {
-        for(int x = 800; x > 0; x--) {
+    for (int32_t y = 600; y > 0; y--) {
+        for (int32_t x = 800; x > 0; x--) {
             randColor = rand() % 3;
-            std::cout << randColor << " ";
+            //std::cout << randColor << " ";
             board[y][x] = randColor;
-            switch(randColor) {
+            switch (randColor) {
                 case pxl_black:
                     ofs << PPM_BLACK_PIXEL;
                     break;
@@ -72,7 +111,51 @@ int main(int argc, char* argv[])
                     break;
             }
         }
-        std::cout << std::endl;
+        //std::cout << std::endl;
+        ofs << std::endl;
+    }
+    ofs.close();
+
+    // do the thing
+    int32_t iterations = 5;
+    do {
+        for (int32_t y = 600 - 1; y > 1; y--) {
+            for (int32_t x = 800 - 1; x > 1; x--) {
+                int32_t similarFans = searchForSimilar(x, y, board[y][x]);
+                if (similarFans >= 4) { continue; }
+                else {
+
+                    uint8_t newColor = sampleFanbase(x, y, board[y][x]);
+                    board[y][x] = newColor;
+                }
+            }
+        }
+
+        iterations--;
+    } while (iterations >= 0);
+
+    // write output ppm
+    ofs.open("result.ppm", std::ofstream::out | std::ofstream::app);
+    ofs << ppm_header;
+
+    // generate data
+    for (int32_t y = 600; y > 0; y--) {
+        for (int32_t x = 800; x > 0; x--) {
+            switch (board[y][x]) {
+                case pxl_black:
+                    ofs << PPM_BLACK_PIXEL;
+                    break;
+                case pxl_green:
+                    ofs << PPM_GREEN_PIXEL;
+                    break;
+                case pxl_brown:
+                    ofs << PPM_BROWN_PIXEL;
+                    break;
+                default:
+                    break;
+            }
+        }
+        //std::cout << std::endl;
         ofs << std::endl;
     }
     ofs.close();
@@ -139,4 +222,5 @@ int main(int argc, char* argv[])
         //
     }
 #endif
+    return 0;
 }

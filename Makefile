@@ -20,8 +20,8 @@ all: $(OBJECTS) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CXX) $(LDFLAGS) -o $(EXECUTABLE) $(OBJECTS) $(LDLIBS)
-	cp -u $(SRC_DIR)/vert_shader.vert $(OBJ_DIR)/vert_shader.vert
-	cp -u $(SRC_DIR)/frag_shader.frag $(OBJ_DIR)/frag_shader.frag
+#	cp -u $(SRC_DIR)/vert_shader.vert $(OBJ_DIR)/vert_shader.vert
+#	cp -u $(SRC_DIR)/frag_shader.frag $(OBJ_DIR)/frag_shader.frag
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(INC_DIR) -c -o $@ $<
@@ -41,8 +41,8 @@ clean:
 	rm -rf $(OBJECTS)
 
 dist-clean: clean
-	rm -rf vert_shader.vert
-	rm -rf frag_shader.frag
 	rm -rf $(EXECUTABLE)
+	rm -rf initial_colors.ppm
+	rm -rf result.ppm
 
 .PHONY: init format clean dist-clean
