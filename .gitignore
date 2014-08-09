@@ -1,8 +1,7 @@
 # Compiled Object files
-bin/*
 *.slo
 *.lo
-*.o
+bin/*.o
 *.obj
 
 # Compiled Dynamic libraries
