@@ -1,7 +1,7 @@
 CC = clang
 CXX = clang++
-CFLAGS = -Wall
-CXXFLAGS = -Wall -std=c++11
+CFLAGS = -Wall -Wextra
+CXXFLAGS = -Wall -Wextra -std=c++11
 
 LD =
 LDFLAGS = -Wall -std=c++11
