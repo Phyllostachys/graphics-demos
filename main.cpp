@@ -1,9 +1,6 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
 
@@ -12,7 +9,7 @@
 
 static GLchar* const vert_shader = {
     R"***(
-    #version 440
+    #version 410
     in vec2 position;
     void main()
     {
@@ -23,7 +20,7 @@ static GLchar* const vert_shader = {
 
 static GLchar* const frag_shader = {
     R"***(
-    #version 440
+    #version 410
     uniform vec3 triangleColor;
     uniform float time;
     out vec4 outColor;
@@ -72,8 +69,6 @@ static GLchar* const frag_shader = {
 
         vec3 intersectionPoint = rayOrigin + t * rayDir;
         vec3 sphereNormal = normalize(intersectionPoint - spherePos);
-        rayDir = normalize(rayOrigin - intersectionPoint);
-        rayDir = reflect(rayDir, sphereNormal);
         float intensity = dot(sphereNormal, intersectionPoint - light) * .2;
 
         outColor = vec4((intensity / 100.0) * triangleColor, 1.0);
