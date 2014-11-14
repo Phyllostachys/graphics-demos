@@ -67,9 +67,11 @@ static GLchar* const frag_shader = {
         light.y = light.y + 100 * cos(mod(time, 60.0) * 3.14);
         //light.z = light.z + 10 * sin(mod(time, 60.0) * 3.14) + 10 * cos(mod(time, 60.0) * 3.14);
 
-        if (length(gl_FragCoord.xyz - spherePos1) > sphereRadius1) discard;
-        if (length(gl_FragCoord.xyz - spherePos2) > sphereRadius2) discard;
-        if (length(gl_FragCoord.xyz - spherePos3) > sphereRadius3) discard;
+        if (length(gl_FragCoord.xyz - spherePos1) > sphereRadius1 &&
+            length(gl_FragCoord.xyz - spherePos2) > sphereRadius2 &&
+            length(gl_FragCoord.xyz - spherePos3) > sphereRadius3) {
+            discard;
+        }
 
         vec3 rayOrigin = gl_FragCoord.xyz;
         rayOrigin.z = 0.0;
