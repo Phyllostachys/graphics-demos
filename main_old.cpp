@@ -1,18 +1,18 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-#include <ctime>
-#include <cstdint>
 #include <iostream>
-#include <random>
 
 #define GLEW_TEST 0
-#define ccs 2;
+#define ccs 3;
 
 static GLchar* const vert_shader = {
     R"***(
-    #version 410
+    #version 440
     in vec2 position;
     void main()
     {
@@ -23,35 +23,23 @@ static GLchar* const vert_shader = {
 
 static GLchar* const frag_shader = {
     R"***(
-    #version 410
-    
-    // Uniforms
+    #version 440
     uniform vec3 triangleColor;
     uniform float time;
-    uniform vec3 spherePos1;
-    uniform float sphereRadius1;
-    uniform vec3 spherePos2;
-    uniform float sphereRadius2;
-    uniform vec3 spherePos3;
-    uniform float sphereRadius3;
-
-    // Output
     out vec4 outColor;
-
-    // Globals
-    vec3 light = vec3(800.0, 450.0, 100.0);
-
+    vec3 light = vec3(800.0, 450.0, 200.0);
+    
     float intersect(vec3 ray, vec3 dir, vec3 center, float radius)
-    {
+    {	
 	    vec3 oc = center - ray;
-	    float dot_loc = dot(dir, oc);
+	    float dot_loc = dot(dir, oc);	
 	    float lsq = dot(dir, dir);
 	    float discriminant = (dot_loc * dot_loc) - lsq * (dot(oc, oc) - (radius * radius));
-
+	
 	    if (discriminant < 0.0) {
 		    return -1.0;
 	    }
-
+	
 	    float i0 = (-dot_loc - sqrt(discriminant)) / lsq;
 	    if (i0 >= 0.0) {
 		    return i0;
@@ -59,49 +47,33 @@ static GLchar* const frag_shader = {
 	    float i1 = (-dot_loc + sqrt(discriminant)) / lsq;
 	    return i1;
     }
-
+    
     void main()
     {
         outColor = vec4(triangleColor, 1.0);
-        //vec3 spherePos = vec3(800.0, 450.0, -20.0);
-        //float sphereRadius = 175.0;
-        light.x = light.x + 200 * sin(mod(time, 60.0) * 3.14);
-        light.y = light.y + 200 * cos(mod(time, 60.0) * 3.14);
-        //light.z = light.z + 10 * sin(mod(time, 60.0) * 3.14);
-
-        if (length(gl_FragCoord.xyz - spherePos1) > sphereRadius1 &&
-            length(gl_FragCoord.xyz - spherePos2) > sphereRadius2 &&
-            length(gl_FragCoord.xyz - spherePos3) > sphereRadius3) {
+        vec3 spherePos = vec3(800.0, 450.0, -20.0);
+        float sphereRadius = 175.0;
+        light.x = light.x + 100 * sin(mod(time, 60.0) * 3.14);
+        light.y = light.y + 100 * cos(mod(time, 60.0) * 3.14);
+        //light.z = light.z + 10 * sin(mod(time, 60.0) * 3.14) + 10 * cos(mod(time, 60.0) * 3.14);
+    
+        if (length(gl_FragCoord.xyz - spherePos) > sphereRadius)
             discard;
-        }
-
+    
         vec3 rayOrigin = gl_FragCoord.xyz;
         rayOrigin.z = 0.0;
         vec3 rayDir = normalize(vec3(0.0, 0.0, -1.0));
-        
-        // Intersect ray with spheres
-        float t1 = intersect(rayOrigin, rayDir, spherePos1, sphereRadius1);
-        float t2 = intersect(rayOrigin, rayDir, spherePos2, sphereRadius2);
-        float t3 = intersect(rayOrigin, rayDir, spherePos3, sphereRadius3);
-        
-        float t;
-        vec3 spherePos;
-        if (t1 > 0.0 && t1 < t2 && t1 < t3) {
-            t = t1;
-            spherePos = spherePos1;
-        } else if (t2 > 0.0 && t2 < t1 && t2 < t3) {
-            t = t2;
-            spherePos = spherePos2;
-        } else if (t3 > 0.0 && t3 < t1 && t3 < t2) {
-            t = t3;
-            spherePos = spherePos3;
-        } else {
+   
+        float t = intersect(rayOrigin, rayDir, spherePos, sphereRadius);
+        if (t < 0.0) {
             outColor = 0.5 * vec4(triangleColor, 1.0);
             return;
         }
 
         vec3 intersectionPoint = rayOrigin + t * rayDir;
         vec3 sphereNormal = normalize(intersectionPoint - spherePos);
+        rayDir = normalize(rayOrigin - intersectionPoint);
+        rayDir = reflect(rayDir, sphereNormal);
         float intensity = dot(sphereNormal, intersectionPoint - light) * .2;
 
         outColor = vec4((intensity / 100.0) * triangleColor, 1.0);
@@ -123,9 +95,7 @@ int main()
 
     GLFWwindow* window = glfwCreateWindow(1600, 900, "Ray Tracing Screensaver", glfwGetPrimaryMonitor(), nullptr);
     glfwMakeContextCurrent(window);
-    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-    std::default_random_engine rand(time(NULL));
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // GLEW init stuff
     glewExperimental = GL_TRUE;
@@ -196,12 +166,6 @@ int main()
 
     GLint uniColor = glGetUniformLocation(shaderProgram, "triangleColor");
     GLint time = glGetUniformLocation(shaderProgram, "time");
-    GLint spherePos1 = glGetUniformLocation(shaderProgram, "spherePos1");
-    GLint sphereRadius1 = glGetUniformLocation(shaderProgram, "sphereRadius1");
-    GLint spherePos2 = glGetUniformLocation(shaderProgram, "spherePos2");
-    GLint sphereRadius2 = glGetUniformLocation(shaderProgram, "sphereRadius2");
-    GLint spherePos3 = glGetUniformLocation(shaderProgram, "spherePos3");
-    GLint sphereRadius3 = glGetUniformLocation(shaderProgram, "sphereRadius3");
 
     // setup vertex array object (attribute object)
     GLuint vao;
@@ -223,17 +187,6 @@ int main()
         blueDown
     } color_inc_state = redUp;
 
-    float spherePositions[3][3] = {
-        { (float)(rand() % 1300) + 149.0f, (float)(rand() % 600) + 149.0f, -20.0f },
-        { (float)(rand() % 1300) + 149.0f, (float)(rand() % 600) + 149.0f, -20.0f },
-        { (float)(rand() % 1300) + 149.0f, (float)(rand() % 600) + 149.0f, -20.0f }
-    };
-
-    float sphereRadii[3] = {
-        (float)(rand() % 125) + 10.0f, (float)(rand() % 125) + 10.0f, (float)(rand() % 125) + 10.0f
-    };
-
-    uint32_t counter = 0;
     while (!glfwWindowShouldClose(window)) {
         // handle events
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) || glfwGetKey(window, GLFW_KEY_ENTER) || glfwGetKey(window, GLFW_KEY_SPACE)) {
@@ -244,27 +197,23 @@ int main()
         }
 
         if (glfwGetTime() - startTime > 0.032) {
-            std::cout << "Frame time: " << glfwGetTime() - startTime << std::endl;
             startTime = glfwGetTime();
-            std::cout << (float)(rand() % 125) << std::endl;
-
+            
             switch (color_inc_state) {
             case redUp:
                 if (r >= 255) {
                     r = 255;
                     color_inc_state = redDown;
-                }
-                else {
+                } else {
                     r += ccs;
-                }
+                }                
                 break;
 
             case redDown:
                 if (r <= 50){
                     r = 50;
                     color_inc_state = greenUp;
-                }
-                else {
+                } else {
                     r -= ccs;
                 }
                 break;
@@ -273,8 +222,7 @@ int main()
                 if (g >= 255) {
                     g = 255;
                     color_inc_state = greenDown;
-                }
-                else {
+                } else {
                     g += ccs;
                 }
                 break;
@@ -283,8 +231,7 @@ int main()
                 if (g <= 50) {
                     g = 50;
                     color_inc_state = blueUp;
-                }
-                else {
+                } else {
                     g -= ccs;
                 }
                 break;
@@ -293,8 +240,7 @@ int main()
                 if (b >= 255) {
                     b = 255;
                     color_inc_state = blueDown;
-                }
-                else {
+                } else {
                     b += ccs;
                 }
                 break;
@@ -303,32 +249,13 @@ int main()
                 if (b <= 50) {
                     b = 50;
                     color_inc_state = redUp;
-                }
-                else {
+                } else {
                     b -= ccs;
                 }
                 break;
 
             default:
                 break;
-            }
-
-            if (counter >= 250) {
-                spherePositions[0][0] = (float)(rand() % 1300) + 149.0f;
-                spherePositions[1][0] = (float)(rand() % 1300) + 149.0f;
-                spherePositions[2][0] = (float)(rand() % 1300) + 149.0f;
-                spherePositions[0][1] = (float)(rand() % 600) + 149.0f;
-                spherePositions[1][1] = (float)(rand() % 600) + 149.0f;
-                spherePositions[2][1] = (float)(rand() % 600) + 149.0f;
-                spherePositions[0][2] = -20.0f;
-                spherePositions[1][2] = -20.0f;
-                spherePositions[2][2] = -20.0f;
-
-                sphereRadii[0] = (float)(rand() % 125) + 10.0f;
-                sphereRadii[1] = (float)(rand() % 125) + 10.0f;
-                sphereRadii[2] = (float)(rand() % 125) + 10.0f;
-
-                counter = 0;
             }
 
             // rendering
@@ -343,22 +270,12 @@ int main()
             //// actual drawing
             glClear(GL_COLOR_BUFFER_BIT);
 
-            // Set Uniforms
             glUniform3f(uniColor, (float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f);
             glUniform1f(time, (float)glfwGetTime());
-            glUniform3f(spherePos1, spherePositions[0][0], spherePositions[0][1], spherePositions[0][2]);
-            glUniform1f(sphereRadius1, sphereRadii[0]);
-            glUniform3f(spherePos2, spherePositions[1][0], spherePositions[1][1], spherePositions[1][2]);
-            glUniform1f(sphereRadius2, sphereRadii[1]);
-            glUniform3f(spherePos3, spherePositions[2][0], spherePositions[2][1], spherePositions[2][2]);
-            glUniform1f(sphereRadius2, sphereRadii[2]);
-
             glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
             // swapping buffers and polling input
             glfwSwapBuffers(window);
-
-            counter++;
         }
         glfwPollEvents();
     }
