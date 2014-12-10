@@ -4,10 +4,11 @@
 #include <cstdlib>
 #include <cmath>
 #include <ctime>
+#include <string>
 
-#include "GL/gl3w.h"
-#define GLFW_INCLUDE_GLU
-#include <GLFW/glfw3.h>
+//#include "GL/gl3w.h"
+//#define GLFW_INCLUDE_GLU
+//#include <GLFW/glfw3.h>
 
 #include "shader_util.h"
 
@@ -44,12 +45,14 @@ static void error_callback(int error, const char* description)
     fputs(description, stderr);
 }
 
+/*
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
 }
+*/
 
 static int32_t searchForSimilar(int32_t x, int32_t y, uint8_t color)
 {
