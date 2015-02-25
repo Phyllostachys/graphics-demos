@@ -10,7 +10,7 @@
 //#define GLFW_INCLUDE_GLU
 //#include <GLFW/glfw3.h>
 
-#include "shader_util.h"
+//#include "shader_util.h"
 
 #define stringify(thing) #thing
 
@@ -38,7 +38,7 @@ enum {
     alg_spiral
 } algorithm = alg_linear;
 
-static const GLfloat background[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+//static const GLfloat background[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 static void error_callback(int error, const char* description)
 {
