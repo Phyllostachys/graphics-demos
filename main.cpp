@@ -1,6 +1,6 @@
 #define GLEW_STATIC
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "GL/glew.h"
+#include "GLFW/glfw3.h"
 
 #include <ctime>
 #include <cstdint>
@@ -10,7 +10,7 @@
 #define GLEW_TEST 0
 #define ccs 2;
 
-static GLchar* const vert_shader = {
+static const GLchar* vert_shader = {
     R"***(
     #version 410
     in vec2 position;
@@ -21,10 +21,10 @@ static GLchar* const vert_shader = {
     )***"
 };
 
-static GLchar* const frag_shader = {
+static const GLchar* frag_shader = {
     R"***(
     #version 410
-    
+
     // Uniforms
     uniform vec3 triangleColor;
     uniform float time;
@@ -78,12 +78,12 @@ static GLchar* const frag_shader = {
         vec3 rayOrigin = gl_FragCoord.xyz;
         rayOrigin.z = 0.0;
         vec3 rayDir = normalize(vec3(0.0, 0.0, -1.0));
-        
+
         // Intersect ray with spheres
         float t1 = intersect(rayOrigin, rayDir, spherePos1, sphereRadius1);
         float t2 = intersect(rayOrigin, rayDir, spherePos2, sphereRadius2);
         float t3 = intersect(rayOrigin, rayDir, spherePos3, sphereRadius3);
-        
+
         float t;
         vec3 spherePos;
         if (t1 > 0.0 && t1 < t2 && t1 < t3) {
@@ -351,7 +351,7 @@ int main()
             glUniform3f(spherePos2, spherePositions[1][0], spherePositions[1][1], spherePositions[1][2]);
             glUniform1f(sphereRadius2, sphereRadii[1]);
             glUniform3f(spherePos3, spherePositions[2][0], spherePositions[2][1], spherePositions[2][2]);
-            glUniform1f(sphereRadius2, sphereRadii[2]);
+            glUniform1f(sphereRadius3, sphereRadii[2]);
 
             glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
