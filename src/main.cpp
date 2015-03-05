@@ -226,8 +226,8 @@ int main(int argc, char* argv[])
     // do the thing
     int32_t iterations = 0;
     do {
-        for (int32_t y = 600 - 1; y > 1; y--) {
-            for (int32_t x = 800 - 1; x > 1; x--) {
+        for (int32_t y = 1; y < height - 1; y++) {
+            for (int32_t x = 1; x < width - 1; x++) {
                 //int32_t similarFans = searchForSimilar(x, y, buffer1[y][x]);
                 //if (similarFans >= 4) { continue; }
                 //else {
@@ -240,12 +240,12 @@ int main(int argc, char* argv[])
         outputPPM(iterations);
         iterations++;
 
-        for (int32_t y = 600 - 1; y > 1; y--) {
-            for (int32_t x = 800 - 1; x > 1; x--) {
+        for (int32_t y = height - 1; y > 1; y--) {
+            for (int32_t x = width - 1; x > 1; x--) {
                 buffer1[y][x] = buffer2[y][x];
             }
         }
-    } while (iterations <= 50);
+    } while (iterations <= 25);
 
 #if 0
     if (animate == true) {
