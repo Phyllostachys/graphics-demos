@@ -113,9 +113,13 @@ static uint8_t sampleFanbase(int32_t x, int32_t y, uint8_t color)
                 newColor = pxl_green;
                 break;
             } else {
-                if      (surroundings[0] == surroundings[2]) { newColor = rand() % 3;  }
-                else if (surroundings[0] > surroundings[2])  { newColor = pxl_black; }
-                else                                         { newColor = pxl_brown; }
+                if (surroundings[0] == surroundings[2]) {
+                    newColor = rand() % 3;
+                } else if (surroundings[0] > surroundings[2]) {
+                    newColor = pxl_black;
+                } else {
+                    newColor = pxl_brown;
+                }
             }
             break;
 
