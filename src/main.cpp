@@ -14,7 +14,8 @@
 
 #define stringify(thing) #thing
 
-uint8_t board[600][800];
+uint8_t buffer1[600][800];
+uint8_t buffer2[600][800];
 bool animate = false;
 
 static const char* ppm_header = {
@@ -59,131 +60,85 @@ static int32_t searchForSimilar(int32_t x, int32_t y, uint8_t color)
     int32_t result = 0;
 
     // top
-    if (board[y - 1][x - 1] == color) { result++; }
-    if (board[y - 1][x] == color) { result++; }
-    if (board[y - 1][x + 1] == color) { result++; }
+    if (buffer1[y - 1][x - 1] == color) { result++; }
+    if (buffer1[y - 1][x] == color) { result++; }
+    if (buffer1[y - 1][x + 1] == color) { result++; }
 
     // left and right
-    if (board[y][x - 1] == color) { result++; }
-    if (board[y][x + 1] == color) { result++; }
+    if (buffer1[y][x - 1] == color) { result++; }
+    if (buffer1[y][x + 1] == color) { result++; }
 
     // bottom
-    if (board[y + 1][x - 1] == color) { result++; }
-    if (board[y + 1][x] == color) { result++; }
-    if (board[y + 1][x - 1] == color) { result++; }
+    if (buffer1[y + 1][x - 1] == color) { result++; }
+    if (buffer1[y + 1][x] == color) { result++; }
+    if (buffer1[y + 1][x - 1] == color) { result++; }
 
     return result;
+}
+
+static int32_t* getSurroundCounts(int32_t x, int32_t y)
+{
+    int32_t bl = 0, gr = 0, br = 0;
+    int32_t* ret = new int32_t[3];
+    ret[0] = searchForSimilar(x, y, pxl_black);
+    ret[1] = searchForSimilar(x, y, pxl_green);
+    ret[2] = searchForSimilar(x, y, pxl_brown);
+    return ret;
 }
 
 static uint8_t sampleFanbase(int32_t x, int32_t y, uint8_t color)
 {
     int32_t bl = 0, gr = 0, br = 0;
     uint8_t newColor = pxl_black;
+    int32_t* surroundings = getSurroundCounts(x,y);
 
     switch (color) {
         case pxl_black:
-            // top
-            if (board[y - 1][x - 1] == pxl_green)      { gr++; }
-            else if (board[y - 1][x - 1] == pxl_brown) { br++; }
-
-            if (board[y - 1][x] == pxl_green)      { gr++; }
-            else if (board[y - 1][x] == pxl_brown) { br++; }
-
-            if (board[y - 1][x + 1] == pxl_green)      { gr++; }
-            else if (board[y - 1][x + 1] == pxl_brown) { br++; }
-
-            // left and right
-            if (board[y][x - 1] == pxl_green)      { gr++; }
-            else if (board[y][x - 1] == pxl_brown) { br++; }
-
-            if (board[y][x + 1] == pxl_green)      { gr++; }
-            else if (board[y][x + 1] == pxl_brown) { br++; }
-
-            // bottom
-            if (board[y + 1][x - 1] == pxl_green)      { gr++; }
-            else if (board[y + 1][x - 1] == pxl_brown) { br++; }
-
-            if (board[y + 1][x] == pxl_green)      { gr++; }
-            else if (board[y + 1][x] == pxl_brown) { br++; }
-
-            if (board[y + 1][x - 1] == pxl_green)      { gr++; }
-            else if (board[y + 1][x - 1] == pxl_brown) { br++; }
-
-            if (gr > br)      { newColor = pxl_green; }
-            else if (gr < br) { newColor = pxl_brown; }
-            else              { newColor = rand() % 3;  }
+            if (surroundings[0] >= 4) {
+                newColor = pxl_black;
+                break;
+            } else {
+                if (surroundings[1] == surroundings[2]) {
+                    newColor = rand() % 3;
+                } else if (surroundings[1] > surroundings[2]) {
+                    newColor = pxl_green;
+                } else {
+                    newColor = pxl_brown;
+                }
+            }
             break;
 
         case pxl_green:
-            // top
-            if (board[y - 1][x - 1] == pxl_black)      { bl++; }
-            else if (board[y - 1][x - 1] == pxl_brown) { br++; }
-
-            if (board[y - 1][x] == pxl_black)      { bl++; }
-            else if (board[y - 1][x] == pxl_brown) { br++; }
-
-            if (board[y - 1][x + 1] == pxl_black)      { bl++; }
-            else if (board[y - 1][x + 1] == pxl_brown) { br++; }
-
-            // left and right
-            if (board[y][x - 1] == pxl_black)      { bl++; }
-            else if (board[y][x - 1] == pxl_brown) { br++; }
-
-            if (board[y][x + 1] == pxl_black)      { bl++; }
-            else if (board[y][x + 1] == pxl_brown) { br++; }
-
-            // bottom
-            if (board[y + 1][x - 1] == pxl_black)      { bl++; }
-            else if (board[y + 1][x - 1] == pxl_brown) { br++; }
-
-            if (board[y + 1][x] == pxl_black)      { bl++; }
-            else if (board[y + 1][x] == pxl_brown) { br++; }
-
-            if (board[y + 1][x - 1] == pxl_black)      { bl++; }
-            else if (board[y + 1][x - 1] == pxl_brown) { br++; }
-
-            if (bl > br)      { newColor = pxl_black; }
-            else if (bl < br) { newColor = pxl_brown; }
-            else              { newColor = rand() % 3;  }
+            if (surroundings[1] >= 4) {
+                newColor = pxl_green;
+                break;
+            } else {
+                if      (surroundings[0] == surroundings[2]) { newColor = rand() % 3;  }
+                else if (surroundings[0] > surroundings[2])  { newColor = pxl_black; }
+                else                                         { newColor = pxl_brown; }
+            }
             break;
 
         case pxl_brown:
-            // top
-            if (board[y - 1][x - 1] == pxl_green)      { gr++; }
-            else if (board[y - 1][x - 1] == pxl_black) { bl++; }
-
-            if (board[y - 1][x] == pxl_green)      { gr++; }
-            else if (board[y - 1][x] == pxl_black) { bl++; }
-
-            if (board[y - 1][x + 1] == pxl_green)      { gr++; }
-            else if (board[y - 1][x + 1] == pxl_black) { bl++; }
-
-            // left and right
-            if (board[y][x - 1] == pxl_green)      { gr++; }
-            else if (board[y][x - 1] == pxl_black) { bl++; }
-
-            if (board[y][x + 1] == pxl_green)      { gr++; }
-            else if (board[y][x + 1] == pxl_black) { bl++; }
-
-            // bottom
-            if (board[y + 1][x - 1] == pxl_green)      { gr++; }
-            else if (board[y + 1][x - 1] == pxl_black) { bl++; }
-
-            if (board[y + 1][x] == pxl_green)      { gr++; }
-            else if (board[y + 1][x] == pxl_black) { bl++; }
-
-            if (board[y + 1][x - 1] == pxl_green)      { gr++; }
-            else if (board[y + 1][x - 1] == pxl_black) { bl++; }
-
-            if (gr > bl)      { newColor = pxl_green; }
-            else if (gr < bl) { newColor = pxl_black; }
-            else              { newColor = rand() % 3;  }
+            if (surroundings[2] >= 4) {
+                newColor = pxl_brown;
+                break;
+            } else {
+                if (surroundings[1] == surroundings[0]) {
+                    newColor = rand() % 3;
+                } else if (surroundings[1] > surroundings[0]) {
+                    newColor = pxl_green;
+                } else {
+                    newColor = pxl_black;
+                }
+            }
             break;
 
         default:
             break;
     }
 
+    delete [] surroundings;
     return newColor;
 }
 
@@ -198,7 +153,12 @@ static void outputPPM(int32_t iteration)
         filename += stringify(alg_spiral);
     }
     filename += "_result_";
-    filename += std::to_string(iteration);
+    if (iteration > 9) {
+        filename += std::to_string(iteration);
+    } else {
+        filename += "0";
+        filename += std::to_string(iteration);
+    }
     filename += "_itr.ppm";
 
     ofs.open(filename, std::ofstream::out | std::ofstream::app);
@@ -206,7 +166,7 @@ static void outputPPM(int32_t iteration)
 
     for (int32_t y = 0; y < 600; y++) {
         for (int32_t x = 0; x < 800; x++) {
-            switch (board[y][x]) {
+            switch (buffer2[y][x]) {
                 case pxl_black:
                     ofs << PPM_BLACK_PIXEL;
                     break;
@@ -239,7 +199,7 @@ int main(int argc, char* argv[])
     for (int32_t y = 0; y < 600; y++) {
         for (int32_t x = 0; x < 800; x++) {
             randColor = rand() % 3;
-            board[y][x] = randColor;
+            buffer1[y][x] = randColor;
             switch (randColor) {
                 case pxl_black:
                     ofs << PPM_BLACK_PIXEL;
@@ -262,23 +222,25 @@ int main(int argc, char* argv[])
     // do the thing
     int32_t iterations = 0;
     do {
-        if (algorithm == alg_linear) {
-            for (int32_t y = 600 - 1; y > 1; y--) {
-                for (int32_t x = 800 - 1; x > 1; x--) {
-                    int32_t similarFans = searchForSimilar(x, y, board[y][x]);
-                    if (similarFans >= 4) { continue; }
-                    else {
-                        uint8_t newColor = sampleFanbase(x, y, board[y][x]);
-                        board[y][x] = newColor;
-                    }
-                }
+        for (int32_t y = 600 - 1; y > 1; y--) {
+            for (int32_t x = 800 - 1; x > 1; x--) {
+                //int32_t similarFans = searchForSimilar(x, y, buffer1[y][x]);
+                //if (similarFans >= 4) { continue; }
+                //else {
+                    uint8_t newColor = sampleFanbase(x, y, buffer1[y][x]);
+                    buffer2[y][x] = newColor;
+                //}
             }
-        } else if (algorithm == alg_spiral) {
-            //
         }
 
         outputPPM(iterations);
         iterations++;
+
+        for (int32_t y = 600 - 1; y > 1; y--) {
+            for (int32_t x = 800 - 1; x > 1; x--) {
+                buffer1[y][x] = buffer2[y][x];
+            }
+        }
     } while (iterations <= 50);
 
 #if 0
