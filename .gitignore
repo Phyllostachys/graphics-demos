@@ -198,8 +198,12 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 
-# Visual Studio files
-vs-proj/Debug/
-vs-proj/ray-tracing-screensaver/Debug/
-vs-proj/ray-tracing-screensaver.v12.suo
-vs-proj/ray-tracing-screensaver.sdf
+# CMake
+CMakeFiles/*
+CMakeCache.txt
+cmake_install.cmake
+
+# Visual Studio (user)
+*.vcxproj
+*.vcxproj.filters
+*.sln
