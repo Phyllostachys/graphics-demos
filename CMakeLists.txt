@@ -27,3 +27,4 @@ else()
 endif(WIN32)
 
 add_executable(ray_tracing_screensaver main.cpp)
+add_executable(ray_tracing_screensaver_old main_old.cpp)
