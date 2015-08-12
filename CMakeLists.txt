@@ -4,18 +4,12 @@ cmake_policy(VERSION 3.0)
 
 project(RayTracingScreensaver)
 
-# find the required packages
-#find_package(GLM REQUIRED)
-#message(STATUS "GLM included at ${GLM_INCLUDE_DIR}")
-#find_package(GLFW3 REQUIRED)
-#message(STATUS "Found GLFW3 in ${GLFW3_INCLUDE_DIR}")
-#find_package(GLEW REQUIRED)
-#message(STATUS "Found GLEW in ${GLEW_INCLUDE_DIR}")
+set(OLD_SOURCES main_old.cpp)
+set(SOURCES main.cpp)
 
 if(WIN32)
     include_directories("include/")
-    link_directories("lib/")
-    link_directories("lib/glfw-lib-vc2010/")
+    link_directories("lib/" "lib/glfw-lib-vc2010/")
     set(LIBS glfw3 opengl32 glew32s)
 elseif(UNIX)
     add_compile_options("-Wall" "-Werror" "-std=c++11")
@@ -33,6 +27,8 @@ else()
   set(LIBS )
 endif(WIN32)
 
-add_executable(ray_tracing_screensaver main.cpp)
-add_executable(ray_tracing_screensaver_old main_old.cpp)
+add_executable(ray_tracing_screensaver ${SOURCES})
+target_link_libraries(ray_tracing_screensaver ${LIBS})
+
+add_executable(ray_tracing_screensaver_old ${OLD_SOURCES})
 target_link_libraries(ray_tracing_screensaver_old ${LIBS})
