@@ -18,16 +18,21 @@ if(WIN32)
     link_directories("lib/glfw-lib-vc2010/")
     set(LIBS glfw3 opengl32 glew32s)
 elseif(UNIX)
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
-    find_package(OpenGL REQUIRED)
-    add_definitions(${OPENGL_DEFINITIONS})
-    find_package(X11 REQUIRED)
+    add_compile_options("-Wall" "-Werror" "-std=c++11")
+
+    find_package(PkgConfig REQUIRED)
+    pkg_search_module(GLFW REQUIRED glfw3)
+    include_directories(${GLFW_INCLUDE_DIRS})
+
+    find_library(GLEW_LIBRARY GLEW)
+
     # note that the order is important for setting the libs
     # use pkg-config --libs $(pkg-config --print-requires --print-requires-private glfw3) in a terminal to confirm
-    set(LIBS ${GLFW3_LIBRARY} X11 Xrandr Xinerama Xi Xxf86vm Xcursor GL dl pthread GLEW)
+    set(LIBS ${GLFW_STATIC_LIBRARIES} dl pthread GLEW)
 else()
   set(LIBS )
 endif(WIN32)
 
 add_executable(ray_tracing_screensaver main.cpp)
 add_executable(ray_tracing_screensaver_old main_old.cpp)
+target_link_libraries(ray_tracing_screensaver_old ${LIBS})
