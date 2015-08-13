@@ -7,25 +7,10 @@ project(RayTracingScreensaver)
 set(SINGLE_SOURCES main_single.cpp)
 set(MULTI_SOURCES main_multi.cpp)
 
-#if(WIN32)
-#    include_directories("include/")
-#    link_directories("lib/" "lib/glfw-lib-vc2010/")
-#    set(LIBS glfw3dll opengl32 glew32s)
-#elseif(UNIX)
-#    add_compile_options("-Wall" "-Werror" "-std=c++11")
-
-#    find_package(PkgConfig REQUIRED)
-#    pkg_search_module(GLFW REQUIRED glfw3)
-#    include_directories(${GLFW_INCLUDE_DIRS})
-
-#    find_library(GLEW_LIBRARY GLEW)
-
-#    # note that the order is important for setting the libs
-#    # use pkg-config --libs $(pkg-config --print-requires --print-requires-private glfw3) in a terminal to confirm
-#    set(LIBS ${GLFW_STATIC_LIBRARIES} dl pthread GLEW)
-#else()
-#  set(LIBS )
-#endif(WIN32)
+if(UNIX)
+    add_compile_options("-Wall" "-std=c++11")
+    set(EXTRA_LIBS dl)
+endif(UNIX)
 
 # GLFW3
 add_subdirectory(glfw)
@@ -40,7 +25,7 @@ add_subdirectory(glm)
 include_directories(glm)
 
 add_executable(raytrace_srcnsvr_single ${SINGLE_SOURCES})
-target_link_libraries(raytrace_srcnsvr_single glfw ${GLFW_LIBRARIES} ${GLAD_LIBRARIES})
+target_link_libraries(raytrace_srcnsvr_single glfw ${GLFW_LIBRARIES} ${GLAD_LIBRARIES} ${EXTRA_LIBS})
 
 add_executable(raytrace_srcnsvr_multi ${MULTI_SOURCES})
-target_link_libraries(raytrace_srcnsvr_multi glfw ${GLFW_LIBRARIES} ${GLAD_LIBRARIES})
+target_link_libraries(raytrace_srcnsvr_multi glfw ${GLFW_LIBRARIES} ${GLAD_LIBRARIES} ${EXTRA_LIBS})
