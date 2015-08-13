@@ -19,5 +19,5 @@ cmake ../
 From there, run either `make` or open Visual Studios to compile.
 
 ### Single Sphere ###
-![](single.gif)
+![](single.gif)  
 That kind of neat banding is an artifact of the gif.
