@@ -1,16 +1,15 @@
-#define GLEW_STATIC
-#include <GL/glew.h>
+#include <iostream>
+#include <string>
+
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <iostream>
-
-#define GLEW_TEST 0
 #define ccs 3;
 
-static GLchar* const vert_shader = {
+std::string vert_shader =
     R"***(
     #version 440
     in vec2 position;
@@ -18,28 +17,29 @@ static GLchar* const vert_shader = {
     {
         gl_Position = vec4(position, 0.0, 1.0);
     }
-    )***"
-};
+    )***";
 
-static GLchar* const frag_shader = {
+std::string frag_shader =
     R"***(
     #version 440
+
+    // Uniforms
     uniform vec3 triangleColor;
     uniform float time;
     out vec4 outColor;
     vec3 light = vec3(800.0, 450.0, 200.0);
-    
+
     float intersect(vec3 ray, vec3 dir, vec3 center, float radius)
-    {	
+    {
 	    vec3 oc = center - ray;
-	    float dot_loc = dot(dir, oc);	
+	    float dot_loc = dot(dir, oc);
 	    float lsq = dot(dir, dir);
 	    float discriminant = (dot_loc * dot_loc) - lsq * (dot(oc, oc) - (radius * radius));
-	
+
 	    if (discriminant < 0.0) {
 		    return -1.0;
 	    }
-	
+
 	    float i0 = (-dot_loc - sqrt(discriminant)) / lsq;
 	    if (i0 >= 0.0) {
 		    return i0;
@@ -47,7 +47,7 @@ static GLchar* const frag_shader = {
 	    float i1 = (-dot_loc + sqrt(discriminant)) / lsq;
 	    return i1;
     }
-    
+
     void main()
     {
         outColor = vec4(triangleColor, 1.0);
@@ -56,14 +56,14 @@ static GLchar* const frag_shader = {
         light.x = light.x + 100 * sin(mod(time, 60.0) * 3.14);
         light.y = light.y + 100 * cos(mod(time, 60.0) * 3.14);
         //light.z = light.z + 10 * sin(mod(time, 60.0) * 3.14) + 10 * cos(mod(time, 60.0) * 3.14);
-    
+
         if (length(gl_FragCoord.xyz - spherePos) > sphereRadius)
             discard;
-    
+
         vec3 rayOrigin = gl_FragCoord.xyz;
         rayOrigin.z = 0.0;
         vec3 rayDir = normalize(vec3(0.0, 0.0, -1.0));
-   
+
         float t = intersect(rayOrigin, rayDir, spherePos, sphereRadius);
         if (t < 0.0) {
             outColor = 0.5 * vec4(triangleColor, 1.0);
@@ -78,8 +78,7 @@ static GLchar* const frag_shader = {
 
         outColor = vec4((intensity / 100.0) * triangleColor, 1.0);
     }
-    )***"
-};
+    )***";
 
 int main()
 {
@@ -97,17 +96,11 @@ int main()
     glfwMakeContextCurrent(window);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    // GLEW init stuff
-    glewExperimental = GL_TRUE;
-    glewInit();
-
-    // GLEW test
-#   if GLEW_TEST > 0
-    GLuint vertexBuffer;
-    glGenBuffers(1, &vertexBuffer);
-
-    printf("%u\n", vertexBuffer);
-#   endif
+    // GLAD init stuff
+    if (!gladLoadGL()) {
+        std::cout << "Failed to initialize OpenGL context" << std::endl;
+        return -1;
+    }
 
     float vertices[] = {
         -1.0f, 1.0f, // Top Left Corner
@@ -128,7 +121,8 @@ int main()
 
     // vertex shader
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vert_shader, NULL);
+    const GLchar* vs = vert_shader.c_str();
+    glShaderSource(vertexShader, 1, &vs, NULL);
     glCompileShader(vertexShader);
 
     // check vertex shader compile status
@@ -144,7 +138,8 @@ int main()
 
     // fragment shader
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &frag_shader, NULL);
+    const GLchar* fs = frag_shader.c_str();
+    glShaderSource(fragmentShader, 1, &fs, NULL);
     glCompileShader(fragmentShader);
 
     // check fragment shader compile status
@@ -198,7 +193,7 @@ int main()
 
         if (glfwGetTime() - startTime > 0.032) {
             startTime = glfwGetTime();
-            
+
             switch (color_inc_state) {
             case redUp:
                 if (r >= 255) {
@@ -206,7 +201,7 @@ int main()
                     color_inc_state = redDown;
                 } else {
                     r += ccs;
-                }                
+                }
                 break;
 
             case redDown:

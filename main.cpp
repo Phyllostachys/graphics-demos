@@ -1,29 +1,31 @@
-#define GLEW_STATIC
-#include "GL/glew.h"
-#include "GLFW/glfw3.h"
+#include <iostream>
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <ctime>
 #include <cstdint>
 #include <iostream>
 #include <random>
 
-#define GLEW_TEST 0
 #define ccs 2;
 
-static const GLchar* vert_shader = {
+std::string vert_shader =
     R"***(
-    #version 410
+    #version 440
     in vec2 position;
     void main()
     {
         gl_Position = vec4(position, 0.0, 1.0);
     }
-    )***"
-};
+    )***";
 
-static const GLchar* frag_shader = {
+std::string frag_shader =
     R"***(
-    #version 410
+    #version 440
 
     // Uniforms
     uniform vec3 triangleColor;
@@ -106,8 +108,7 @@ static const GLchar* frag_shader = {
 
         outColor = vec4((intensity / 100.0) * triangleColor, 1.0);
     }
-    )***"
-};
+    )***";
 
 int main()
 {
@@ -127,17 +128,11 @@ int main()
 
     std::default_random_engine rand(time(NULL));
 
-    // GLEW init stuff
-    glewExperimental = GL_TRUE;
-    glewInit();
-
-    // GLEW test
-#   if GLEW_TEST > 0
-    GLuint vertexBuffer;
-    glGenBuffers(1, &vertexBuffer);
-
-    printf("%u\n", vertexBuffer);
-#   endif
+    // GLAD init stuff
+    if (!gladLoadGL()) {
+        std::cout << "Failed to initialize OpenGL context" << std::endl;
+        return -1;
+    }
 
     float vertices[] = {
         -1.0f, 1.0f, // Top Left Corner
@@ -158,7 +153,8 @@ int main()
 
     // vertex shader
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vert_shader, NULL);
+    const GLchar* vs = vert_shader.c_str();
+    glShaderSource(vertexShader, 1, &vs, NULL);
     glCompileShader(vertexShader);
 
     // check vertex shader compile status
@@ -174,7 +170,8 @@ int main()
 
     // fragment shader
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &frag_shader, NULL);
+    const GLchar* fs = frag_shader.c_str();
+    glShaderSource(fragmentShader, 1, &fs, NULL);
     glCompileShader(fragmentShader);
 
     // check fragment shader compile status
