@@ -8,8 +8,10 @@ A little project to learn a bit about modern OpenGL and raytracing. There are tw
 - [glm](https://github.com/g-truc/glm) - for some sweet GLSL maths
 
 ### Build ###
-To build, run in Windows or *nix
+To build, run in Windows cmd/PS or *nix shell:
 ```shell
+git submodule init
+git submodule update
 mkdir build
 cd build
 cmake ../
