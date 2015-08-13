@@ -10,7 +10,7 @@ set(SOURCES main.cpp)
 if(WIN32)
     include_directories("include/")
     link_directories("lib/" "lib/glfw-lib-vc2010/")
-    set(LIBS glfw3 opengl32 glew32s)
+    set(LIBS glfw3dll opengl32 glew32s)
 elseif(UNIX)
     add_compile_options("-Wall" "-Werror" "-std=c++11")
 
