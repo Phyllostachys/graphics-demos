@@ -1,8 +1,10 @@
 ## ray-tracing-screensaver ##
 
-Uses:
-- GLEW 1.13.0
-- GLFW 3.1.1
-- GLM 0.9.7
+A little project to learn a bit about modern OpenGL and raytracing. 
+
+### Uses ###
+- [glad](https://github.com/Dav1dde/glad) - to get the latest and greatest in OpenGL
+- [glfw](https://github.com/glfw/glfw) - for window context creation
+- [glm](https://github.com/g-truc/glm) - for some sweet GLSL maths
 
 
