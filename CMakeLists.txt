@@ -7,28 +7,40 @@ project(RayTracingScreensaver)
 set(OLD_SOURCES main_old.cpp)
 set(SOURCES main.cpp)
 
-if(WIN32)
-    include_directories("include/")
-    link_directories("lib/" "lib/glfw-lib-vc2010/")
-    set(LIBS glfw3dll opengl32 glew32s)
-elseif(UNIX)
-    add_compile_options("-Wall" "-Werror" "-std=c++11")
+#if(WIN32)
+#    include_directories("include/")
+#    link_directories("lib/" "lib/glfw-lib-vc2010/")
+#    set(LIBS glfw3dll opengl32 glew32s)
+#elseif(UNIX)
+#    add_compile_options("-Wall" "-Werror" "-std=c++11")
 
-    find_package(PkgConfig REQUIRED)
-    pkg_search_module(GLFW REQUIRED glfw3)
-    include_directories(${GLFW_INCLUDE_DIRS})
+#    find_package(PkgConfig REQUIRED)
+#    pkg_search_module(GLFW REQUIRED glfw3)
+#    include_directories(${GLFW_INCLUDE_DIRS})
 
-    find_library(GLEW_LIBRARY GLEW)
+#    find_library(GLEW_LIBRARY GLEW)
 
-    # note that the order is important for setting the libs
-    # use pkg-config --libs $(pkg-config --print-requires --print-requires-private glfw3) in a terminal to confirm
-    set(LIBS ${GLFW_STATIC_LIBRARIES} dl pthread GLEW)
-else()
-  set(LIBS )
-endif(WIN32)
+#    # note that the order is important for setting the libs
+#    # use pkg-config --libs $(pkg-config --print-requires --print-requires-private glfw3) in a terminal to confirm
+#    set(LIBS ${GLFW_STATIC_LIBRARIES} dl pthread GLEW)
+#else()
+#  set(LIBS )
+#endif(WIN32)
+
+# GLFW3
+add_subdirectory(glfw)
+include_directories(glfw/include)
+
+# GLAD
+add_subdirectory(glad)
+include_directories(${GLAD_INCLUDE_DIRS})
+
+# GLM
+add_subdirectory(glm)
+include_directories(glm)
 
 add_executable(ray_tracing_screensaver ${SOURCES})
-target_link_libraries(ray_tracing_screensaver ${LIBS})
+target_link_libraries(ray_tracing_screensaver glfw ${GLFW_LIBRARIES} ${GLAD_LIBRARIES})
 
 add_executable(ray_tracing_screensaver_old ${OLD_SOURCES})
-target_link_libraries(ray_tracing_screensaver_old ${LIBS})
+target_link_libraries(ray_tracing_screensaver_old glfw ${GLFW_LIBRARIES} ${GLAD_LIBRARIES})
