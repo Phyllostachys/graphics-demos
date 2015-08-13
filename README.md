@@ -17,4 +17,4 @@ cmake ../
 From there, run either `make` or open Visual Studios to compile.
 
 ### Single Sphere ###
-![](single2.gif)
+![](single3.gif)
