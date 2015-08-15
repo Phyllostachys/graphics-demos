@@ -14,6 +14,7 @@
 
 #define stringify(thing) #thing
 
+const uint32_t width = 800, height = 600;
 uint8_t buffer1[600][800];
 uint8_t buffer2[600][800];
 bool animate = false;

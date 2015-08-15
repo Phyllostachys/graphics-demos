@@ -13,16 +13,16 @@ if(UNIX)
 endif(UNIX)
 
 # GLFW3
-add_subdirectory(glfw)
-include_directories(glfw/include)
+#add_subdirectory(glfw)
+include_directories(../glfw/include)
 
 # GLAD
-add_subdirectory(glad)
+#add_subdirectory(glad)
 include_directories(${GLAD_INCLUDE_DIRS})
 
 # GLM
-add_subdirectory(glm)
-include_directories(glm)
+#add_subdirectory(glm)
+include_directories(../glm)
 
 add_executable(raytrace_srcnsvr_single ${SINGLE_SOURCES})
 target_link_libraries(raytrace_srcnsvr_single glfw ${GLFW_LIBRARIES} ${GLAD_LIBRARIES} ${EXTRA_LIBS})

@@ -3,5 +3,9 @@ project(camo-generator)
 
 include_directories(include src)
 
-set(CMAKE_CXX_FLAGS -std=c++11)
+if(UNIX)
+    add_compile_options("-Wall" "-std=c++11")
+    set(EXTRA_LIBS dl)
+endif(UNIX)
+
 add_executable(camo-generator src/main.cpp)
