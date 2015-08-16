@@ -12,14 +12,12 @@ float intersect(glm::vec3 ray, glm::vec3 dir, glm::vec3 center, float radius)
     float lsq = glm::dot(dir, dir);
     float discriminant = (dot_loc * dot_loc) - lsq * (glm::dot(oc, oc) - (radius * radius));
 
-    if (discriminant < 0.0)
-    {
+    if (discriminant < 0.0) {
         return -1.0;
     }
 
     float i0 = (-dot_loc - glm::sqrt(discriminant)) / lsq;
-    if (i0 >= 0.0)
-    {
+    if (i0 >= 0.0) {
         return i0;
     }
     float i1 = (-dot_loc + glm::sqrt(discriminant)) / lsq;
@@ -36,8 +34,7 @@ int main()
     //light.y = light.y + 100 * cos(mod(time, 60.0) * 3.14);
     light.z = light.z + 10.0f * glm::sin(glm::mod(time, 60.0f) * 3.14f) + 10.0f * glm::cos(glm::mod(time, 60.0f) * 3.14f);
 
-    if (glm::length(glm::vec3(gl_FragCoord.x - spherePos.x, gl_FragCoord.y - spherePos.y, gl_FragCoord.z - spherePos.z)) > sphereRadius)
-    {
+    if (glm::length(glm::vec3(gl_FragCoord.x - spherePos.x, gl_FragCoord.y - spherePos.y, gl_FragCoord.z - spherePos.z)) > sphereRadius) {
         outColor = glm::vec4(0.8f, 0.8f, 0.8f, 1.0f);
         return 0;
     }

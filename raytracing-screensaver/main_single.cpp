@@ -7,7 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#define ccs 3;
+#define COLOR_INC_VALUE 3;
 
 std::string vert_shader =
     R"***(
@@ -186,8 +186,7 @@ int main()
         // handle events
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) || glfwGetKey(window, GLFW_KEY_ENTER) || glfwGetKey(window, GLFW_KEY_SPACE)) {
             glfwSetWindowShouldClose(window, GL_TRUE);
-        }
-        else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) || glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT)) {
+        } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) || glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT)) {
             glfwSetWindowShouldClose(window, GL_TRUE);
         }
 
@@ -195,62 +194,62 @@ int main()
             startTime = glfwGetTime();
 
             switch (color_inc_state) {
-            case redUp:
-                if (r >= 255) {
-                    r = 255;
-                    color_inc_state = redDown;
-                } else {
-                    r += ccs;
-                }
-                break;
+                case redUp:
+                    if (r >= 255) {
+                        r = 255;
+                        color_inc_state = redDown;
+                    } else {
+                        r += COLOR_INC_VALUE;
+                    }
+                    break;
 
-            case redDown:
-                if (r <= 50){
-                    r = 50;
-                    color_inc_state = greenUp;
-                } else {
-                    r -= ccs;
-                }
-                break;
+                case redDown:
+                    if (r <= 50) {
+                        r = 50;
+                        color_inc_state = greenUp;
+                    } else {
+                        r -= COLOR_INC_VALUE;
+                    }
+                    break;
 
-            case greenUp:
-                if (g >= 255) {
-                    g = 255;
-                    color_inc_state = greenDown;
-                } else {
-                    g += ccs;
-                }
-                break;
+                case greenUp:
+                    if (g >= 255) {
+                        g = 255;
+                        color_inc_state = greenDown;
+                    } else {
+                        g += COLOR_INC_VALUE;
+                    }
+                    break;
 
-            case greenDown:
-                if (g <= 50) {
-                    g = 50;
-                    color_inc_state = blueUp;
-                } else {
-                    g -= ccs;
-                }
-                break;
+                case greenDown:
+                    if (g <= 50) {
+                        g = 50;
+                        color_inc_state = blueUp;
+                    } else {
+                        g -= COLOR_INC_VALUE;
+                    }
+                    break;
 
-            case blueUp:
-                if (b >= 255) {
-                    b = 255;
-                    color_inc_state = blueDown;
-                } else {
-                    b += ccs;
-                }
-                break;
+                case blueUp:
+                    if (b >= 255) {
+                        b = 255;
+                        color_inc_state = blueDown;
+                    } else {
+                        b += COLOR_INC_VALUE;
+                    }
+                    break;
 
-            case blueDown:
-                if (b <= 50) {
-                    b = 50;
-                    color_inc_state = redUp;
-                } else {
-                    b -= ccs;
-                }
-                break;
+                case blueDown:
+                    if (b <= 50) {
+                        b = 50;
+                        color_inc_state = redUp;
+                    } else {
+                        b -= COLOR_INC_VALUE;
+                    }
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
             }
 
             // rendering

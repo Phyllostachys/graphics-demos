@@ -12,6 +12,12 @@ add_subdirectory(glad)
 # GLM
 add_subdirectory(glm)
 
+# Utility library
+add_subdirectory(utils)
+
+# blank project
+add_subdirectory(blank)
+
 # camo generator
 add_subdirectory(camo-gen)
 

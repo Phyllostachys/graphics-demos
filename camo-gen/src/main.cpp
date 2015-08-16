@@ -61,18 +61,34 @@ static int32_t searchForSimilar(int32_t x, int32_t y, uint8_t color)
     int32_t result = 0;
 
     // top
-    if (buffer1[y - 1][x - 1] == color) { result++; }
-    if (buffer1[y - 1][x] == color) { result++; }
-    if (buffer1[y - 1][x + 1] == color) { result++; }
+    if (buffer1[y - 1][x - 1] == color) {
+        result++;
+    }
+    if (buffer1[y - 1][x] == color) {
+        result++;
+    }
+    if (buffer1[y - 1][x + 1] == color) {
+        result++;
+    }
 
     // left and right
-    if (buffer1[y][x - 1] == color) { result++; }
-    if (buffer1[y][x + 1] == color) { result++; }
+    if (buffer1[y][x - 1] == color) {
+        result++;
+    }
+    if (buffer1[y][x + 1] == color) {
+        result++;
+    }
 
     // bottom
-    if (buffer1[y + 1][x - 1] == color) { result++; }
-    if (buffer1[y + 1][x] == color) { result++; }
-    if (buffer1[y + 1][x - 1] == color) { result++; }
+    if (buffer1[y + 1][x - 1] == color) {
+        result++;
+    }
+    if (buffer1[y + 1][x] == color) {
+        result++;
+    }
+    if (buffer1[y + 1][x - 1] == color) {
+        result++;
+    }
 
     return result;
 }
@@ -91,7 +107,7 @@ static uint8_t sampleFanbase(int32_t x, int32_t y, uint8_t color)
 {
     int32_t bl = 0, gr = 0, br = 0;
     uint8_t newColor = pxl_black;
-    int32_t* surroundings = getSurroundCounts(x,y);
+    int32_t* surroundings = getSurroundCounts(x, y);
 
     switch (color) {
         case pxl_black:
@@ -232,8 +248,8 @@ int main(int argc, char* argv[])
                 //int32_t similarFans = searchForSimilar(x, y, buffer1[y][x]);
                 //if (similarFans >= 4) { continue; }
                 //else {
-                    uint8_t newColor = sampleFanbase(x, y, buffer1[y][x]);
-                    buffer2[y][x] = newColor;
+                uint8_t newColor = sampleFanbase(x, y, buffer1[y][x]);
+                buffer2[y][x] = newColor;
                 //}
             }
         }

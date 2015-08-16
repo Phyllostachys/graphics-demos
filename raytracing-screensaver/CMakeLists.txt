@@ -1,4 +1,3 @@
-# inspired by https://github.com/JoeyDeVries/LearnOpenGL/blob/master/CMakeLists.txt
 cmake_minimum_required (VERSION 3.0)
 cmake_policy(VERSION 3.0)
 
@@ -13,15 +12,12 @@ if(UNIX)
 endif(UNIX)
 
 # GLFW3
-#add_subdirectory(glfw)
 include_directories(../glfw/include)
 
 # GLAD
-#add_subdirectory(glad)
 include_directories(${GLAD_INCLUDE_DIRS})
 
 # GLM
-#add_subdirectory(glm)
 include_directories(../glm)
 
 add_executable(raytrace_srcnsvr_single ${SINGLE_SOURCES})

@@ -54,7 +54,9 @@ GLuint compile_shaders(void)
     GLsizei length;
     GLchar logBuffer[1024];
     glGetShaderInfoLog(vertShader, 1024, &length, logBuffer);
-    if (length > 0) { std::cout << logBuffer << std::endl; }
+    if (length > 0) {
+        std::cout << logBuffer << std::endl;
+    }
 #endif
 #ifndef NO_FILE_SHADERS
     inBuffer.clear();
@@ -80,7 +82,9 @@ GLuint compile_shaders(void)
 
 #ifdef DEBUG
     glGetShaderInfoLog(vertShader, 1024, &length, logBuffer);
-    if (length > 0) { std::cout << logBuffer << std::endl; }
+    if (length > 0) {
+        std::cout << logBuffer << std::endl;
+    }
 #endif
 #ifndef NO_FILE_SHADERS
     inBuffer.clear();
