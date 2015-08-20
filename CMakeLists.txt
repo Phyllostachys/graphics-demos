@@ -3,6 +3,11 @@ cmake_policy(VERSION 3.0)
 
 project(graphics-demos)
 
+#if(EXISTS ".gitmodules")
+#    message(" -- Update git submodules --")
+#    execute_process(COMMAND git submodule update --init --recursive)
+#endif()
+
 # GLFW3
 add_subdirectory(glfw)
 
