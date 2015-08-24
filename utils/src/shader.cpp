@@ -97,6 +97,18 @@ static bool isShaderStatusGood(GLint shaderHandle, GLenum statusType, char error
     }
 }
 
+static bool isShaderProgramStatusGood(GLint programHandle, GLenum statusType, char errorMsg[1024])
+{
+    GLint status;
+    glGetProgramiv(programHandle, statusType, &status);
+    if (status != GL_TRUE) {
+        glGetProgramInfoLog(shaderHandle, 1024, NULL, errorMsg);
+        return false;
+    } else {
+        return true;
+    }
+}
+
 bool Shader::compile()
 {
     char buffer[1024];
@@ -144,7 +156,7 @@ bool Shader::compile()
     // remember that a call to glUseProgram will still need to be done
 
     // check program link status
-    if (!isShaderStatusGood(shaderProgHandle, GL_LINK_STATUS, buffer)) {
+    if (!isProgramStatusGood(shaderProgHandle, GL_LINK_STATUS, buffer)) {
         anyErrors = true;
         std::cout << buffer << std::endl;
         return false;
