@@ -12,7 +12,7 @@ project(graphics-demos)
 add_subdirectory(glfw)
 
 # GLAD
-add_subdirectory(glad)
+#add_subdirectory(glad)
 
 # GLM
 add_subdirectory(glm)
@@ -21,10 +21,13 @@ add_subdirectory(glm)
 add_subdirectory(utils)
 
 # blank project
-add_subdirectory(blank)
+#add_subdirectory(blank)
 
 # camo generator
 add_subdirectory(camo-gen)
 
 # Raytracing screensaver
 add_subdirectory(raytracing-screensaver)
+
+# Texture test
+add_subdirectory(texturing-test)

@@ -6,7 +6,7 @@
 
 // src - a file that has been opened already
 // dest - a std::string where the contents of src will be put into
-static void readFile(std::string dest, FILE* src)
+static void readFile(std::string& dest, FILE* src)
 {
     char* fileBuf;
     size_t fileSize;
@@ -43,16 +43,15 @@ Shader::Shader(std::string vert_filename, std::string frag_filename)
 {
     FILE* inFile;
 
-    inFile = fopen(vert_filename.c_str(), "r");
+    inFile = fopen(vert_filename.c_str(), "rb");
     if (inFile == NULL) {
         std::cout << "Vertex shader file doesn't exist.\n";
         anyErrors = true;
         return;
     }
     readFile(vertSource, inFile);
-    fclose(inFile);
 
-    inFile = fopen(frag_filename.c_str(), "r");
+    inFile = fopen(frag_filename.c_str(), "rb");
     if (inFile == NULL) {
         std::cout << "Fragment shader file doesn't exist.\n";
         anyErrors = true;
@@ -89,20 +88,12 @@ static bool isShaderStatusGood(GLint shaderHandle, GLenum statusType, char error
 {
     GLint status;
     glGetShaderiv(shaderHandle, statusType, &status);
-    if (status != GL_TRUE) {
-        glGetShaderInfoLog(shaderHandle, 1024, NULL, errorMsg);
-        return false;
-    } else {
-        return true;
-    }
-}
-
-static bool isShaderProgramStatusGood(GLint programHandle, GLenum statusType, char errorMsg[1024])
-{
-    GLint status;
-    glGetProgramiv(programHandle, statusType, &status);
-    if (status != GL_TRUE) {
-        glGetProgramInfoLog(shaderHandle, 1024, NULL, errorMsg);
+    if (status == GL_FALSE) {
+        GLint length;
+        glGetShaderiv(shaderHandle, GL_INFO_LOG_LENGTH, &length);
+        std::cout << "Shader compile error is " << length << " chars long.\n";
+        glGetShaderInfoLog(shaderHandle, length, NULL, errorMsg);
+        std::cout << "glCompileShader failed: " << errorMsg << "\n";
         return false;
     } else {
         return true;
@@ -156,11 +147,27 @@ bool Shader::compile()
     // remember that a call to glUseProgram will still need to be done
 
     // check program link status
-    if (!isProgramStatusGood(shaderProgHandle, GL_LINK_STATUS, buffer)) {
+    /*if (!isShaderProgramStatusGood(shaderProgHandle, GL_LINK_STATUS, buffer)) {
         anyErrors = true;
         std::cout << buffer << std::endl;
         return false;
-    }
+    }*/
 
+    GLint status;
+    glGetProgramiv(shaderProgHandle, GL_LINK_STATUS, &status);
+    if (status == GL_FALSE) {
+        GLint length;
+        glGetProgramiv(shaderProgHandle, GL_INFO_LOG_LENGTH, &length);
+        GLchar *info = new GLchar[length];
+        glGetProgramInfoLog(shaderProgHandle, length, NULL, info);
+        std::cout << "glLinkProgram failed: " << info << std::endl;
+        delete [] info;
+    }
+    //glDetachShader(shaderProgHandle, vertShaderHandle);
+    //glDetachShader(shaderProgHandle, fragShaderHandle);
+    //glDeleteShader(vertShaderHandle);
+    //glDeleteShader(fragShaderHandle);
+
+    compiled = true;
     return true;
 }

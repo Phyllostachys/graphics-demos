@@ -3,19 +3,22 @@ cmake_policy(VERSION 3.0)
 
 project(RayTracingScreensaver)
 
-set(SINGLE_SOURCES main_single.cpp)
-set(MULTI_SOURCES main_multi.cpp)
+set(SINGLE_SOURCES src/main_single.cpp src/glad.c)
+set(MULTI_SOURCES src/main_multi.cpp src/glad.c)
 
-if(UNIX)
+if(UNIX OR MINGW)
     add_compile_options("-Wall" "-std=c++11")
-    set(EXTRA_LIBS dl)
-endif(UNIX)
+    if(UNIX)
+        set(EXTRA_LIBS dl)
+    endif(UNIX)
+endif(UNIX OR MINGW)
 
 # GLFW3
 include_directories(../glfw/include)
 
 # GLAD
-include_directories(${GLAD_INCLUDE_DIRS})
+#include_directories(${GLAD_INCLUDE_DIRS})
+include_directories(include)
 
 # GLM
 include_directories(../glm)

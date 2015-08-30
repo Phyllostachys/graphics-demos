@@ -5,9 +5,11 @@ project(camo-generator)
 
 include_directories(src)
 
-if(UNIX)
+if(UNIX OR MINGW)
     add_compile_options("-Wall" "-std=c++11")
-    set(EXTRA_LIBS dl)
-endif(UNIX)
+    if(UNIX)
+        set(EXTRA_LIBS dl)
+    endif(UNIX)
+endif(UNIX OR MINGW)
 
 add_executable(camo-generator src/main.cpp)

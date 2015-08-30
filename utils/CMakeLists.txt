@@ -6,7 +6,7 @@ project(utils)
 include_directories(include)
 include_directories(${GLAD_INCLUDE_DIRS})
 
-add_library(shader STATIC src/shader.cpp)
+add_library(shader STATIC src/shader.cpp src/glad.c)
 target_link_libraries(shader glfw ${GLFW_LIBRARIES} ${GLAD_LIBRARIES} ${EXTRA_LIBS})
 
 set(UTILS_INCLUDE_DIRS include)
