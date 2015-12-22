@@ -12,7 +12,7 @@ project(graphics-demos)
 add_subdirectory(glfw)
 
 # GLAD
-#add_subdirectory(glad)
+add_subdirectory(glad)
 
 # GLM
 add_subdirectory(glm)
