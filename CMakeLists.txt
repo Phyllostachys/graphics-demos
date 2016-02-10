@@ -3,11 +3,18 @@ cmake_policy(VERSION 3.0)
 
 project(graphics-demos)
 
-# GLFW3
-add_subdirectory(glfw)
+if(WIN32)
+    # GLFW3
+    add_subdirectory(glfw)
 
-# GLM
-add_subdirectory(glm)
+    # GLM
+    add_subdirectory(glm)
+else(WIN32)
+    # we are in an environment where we
+    # can get glfw and glm from package managers
+    set(GLFW_LIBRARIES X11 pthread Xrandr Xinerama Xi Xxf86vm rt m Xcursor GL)
+endif(WIN32)
+
 
 # Utility library
 #add_subdirectory(utils)
@@ -17,7 +24,6 @@ add_subdirectory(glm)
 
 # camo generator
 #add_subdirectory(camo-gen)
-
 
 
 if(UNIX OR MINGW)
