@@ -3,16 +3,8 @@ cmake_policy(VERSION 3.0)
 
 project(graphics-demos)
 
-#if(EXISTS ".gitmodules")
-#    message(" -- Update git submodules --")
-#    execute_process(COMMAND git submodule update --init --recursive)
-#endif()
-
 # GLFW3
 add_subdirectory(glfw)
-
-# GLAD
-add_subdirectory(glad)
 
 # GLM
 add_subdirectory(glm)
@@ -29,22 +21,24 @@ add_subdirectory(glm)
 
 
 if(UNIX OR MINGW)
-    add_compile_options("-Wall" "-std=c++11")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11")
     if(UNIX)
         set(EXTRA_LIBS dl)
     endif(UNIX)
 endif(UNIX OR MINGW)
 
-#include_directories(include)
-include_directories(glfw/include/)
-include_directories(${GLAD_INCLUDE_DIRS})
+set(GLAD_SOURCE src/glad/src/glad.c)
+
 include_directories(glm)
+include_directories(glfw/include)
+include_directories(src)
+include_directories(src/glad/include)
 
-add_executable(raytracing_frag_shader_single src/raytracing_frag_shader_one_sphere.cpp)
-target_link_libraries(raytracing_frag_shader_single glfw3 ${GLFW_LIBRARIES} ${GLAD_LIBRARIES} ${EXTRA_LIBS})
+add_executable(raytracing_frag_shader_single src/raytracing_frag_shader_one_sphere.cpp ${GLAD_SOURCE})
+target_link_libraries(raytracing_frag_shader_single glfw3 ${GLFW_LIBRARIES} ${EXTRA_LIBS})
 
-add_executable(raytracing_frag_shader_multi src/raytracing_frag_shader_many_spheres.cpp)
-target_link_libraries(raytracing_frag_shader_single glfw3 ${GLFW_LIBRARIES} ${GLAD_LIBRARIES} ${EXTRA_LIBS})
+add_executable(raytracing_frag_shader_multi src/raytracing_frag_shader_many_spheres.cpp ${GLAD_SOURCE})
+target_link_libraries(raytracing_frag_shader_multi glfw3 ${GLFW_LIBRARIES} ${EXTRA_LIBS})
 
 #add_executable(tex src/texturing_tri_demo.cpp src/lodepng.cpp)
 #target_link_libraries(tex glfw ${GLFW_LIBRARIES} ${GLAD_LIBRARIES} ${EXTRA_LIBS} shader)

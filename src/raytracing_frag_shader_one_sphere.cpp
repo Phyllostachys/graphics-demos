@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 
-#include <glad/glad.h>
+#include "glad/glad.h"
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -94,7 +94,7 @@ int main()
 
     GLFWwindow* window = glfwCreateWindow(1600, 900, "Ray Tracing Screensaver", glfwGetPrimaryMonitor(), nullptr);
     glfwMakeContextCurrent(window);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // GLAD init stuff
     if (!gladLoadGL()) {
