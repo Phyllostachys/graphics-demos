@@ -80,10 +80,16 @@ std::string frag_shader =
     }
     )***";
 
+extern "C" void error_callback(int error, const char* description)
+{
+    std::cout << "ERROR " << error << " -- " <<  description << std::endl;;
+}
+
 int main()
 {
     // GLFW3 init stuff
     glfwInit();
+    glfwSetErrorCallback(error_callback);
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -93,6 +99,11 @@ int main()
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
     GLFWwindow* window = glfwCreateWindow(1600, 900, "Ray Tracing Screensaver", glfwGetPrimaryMonitor(), nullptr);
+    if (!window) {
+        std::cout << "Failed to create window" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
     glfwMakeContextCurrent(window);
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
