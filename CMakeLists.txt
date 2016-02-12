@@ -23,7 +23,7 @@ endif(WIN32)
 #add_subdirectory(blank)
 
 # camo generator
-#add_subdirectory(camo-gen)
+add_subdirectory(camo-gen)
 
 
 if(UNIX OR MINGW)
