@@ -128,67 +128,13 @@ int main(int argc, char** argv)
     GLint mvpLoc = glGetUniformLocation(s.getShaderProgram(), "MVP");
     GLint timeLoc = glGetUniformLocation(s.getShaderProgram(), "time");
 
-/*
-    glm::mat4 model;
-    model = glm::scale(model, glm::vec3(0.6, 0.6, 0.6));
-    model = glm::rotate(model, 1.0f, glm::vec3(1.0f, 1.0f, 0.0f));
-    model = glm::translate(model, glm::vec3(0.0, 0.0, 2.0));
-    //*
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            printf("%2.3f\t", model[j][i]);
-            if (j == 3)
-                printf("\n");
-        }
-    }
-
-    printf("\n");
-    ///
-
-    glm::mat4 view = glm::lookAt(
-        glm::vec3(0.0, 0.0, 7.0),
-        glm::vec3(0.0, 0.0, 0.0),
-        glm::vec3(0.0, 1.0, 0.0));
-    /*
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            printf("%2.3f\t", view[j][i]);
-            if (j == 3)
-                printf("\n");
-        }
-    }
-    /
-
-    glm::mat4 proj = glm::perspective(45.0f, (GLfloat)width / (GLfloat)height, 0.1f, 100.0f);//glm::ortho(0.0f, (float)width, 0.0f, (float)height, 0.1f, 100.0f);
-    /*
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            printf("%2.3f\t", view[j][i]);
-            if (j == 3)
-                printf("\n");
-        }
-    }
-
-    printf("\n");
-    /
-
-    glm::mat4 mvp = proj * view * model;//proj * view * model;
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            printf("%2.3f\t", mvp[j][i]);
-            if (j == 3)
-                printf("\n");
-        }
-    }
-    //*/
-
     glEnable(GL_DEPTH_TEST);
-
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_FRONT);
 
     // main loop
     while (!glfwWindowShouldClose(window)) {
+        /* Poll for and process events */
+        glfwPollEvents();
+
         glm::mat4 center, scale, rotate, translate;
         center = glm::translate(center, glm::vec3(-0.5, -0.5, -0.5));
         //scale = glm::scale(scale, glm::vec3(1.6, 1.6, 1.6));
@@ -198,7 +144,7 @@ int main(int argc, char** argv)
         glm::mat4 model;
         model = translate * rotate * scale * center * model;
         glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-        glm::mat4 proj = glm::perspective(45.0f, (GLfloat)width / (GLfloat)height, 0.1f, 100.0f);
+        glm::mat4 proj = glm::perspective(45.0f, (GLfloat)width / (GLfloat)height, 0.1f, 1000.0f);
         glm::mat4 mvp = proj * view * model;
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -213,9 +159,6 @@ int main(int argc, char** argv)
         glDrawElements(GL_TRIANGLES, NUM_CUBE_IND, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
-
-        /* Poll for and process events */
-        glfwPollEvents();
     }
 
     glfwTerminate();
