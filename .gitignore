@@ -35,6 +35,9 @@ build/*
 *.out
 *.app
 
+# Visual Studios
+*.ilk
+*.pdb
 
 ### CMake ###
 CMakeCache.txt
