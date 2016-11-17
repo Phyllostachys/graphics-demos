@@ -1,5 +1,4 @@
-.tags
-.tags1
+.tags*
 build/*
 !build/.keep
 
