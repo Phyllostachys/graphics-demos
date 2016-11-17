@@ -8,7 +8,7 @@ A repo to store and showcase any graphics demos that I make.
 - [glm](https://github.com/g-truc/glm) - for some sweet GLSL maths
 
 ### Build ###
-To build, run in Windows cmd/PS or *nix shell:
+To build, run in Windows cmd or *nix shell:
 ```shell
 git submodule init
 git submodule update
