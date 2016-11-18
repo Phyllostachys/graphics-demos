@@ -103,7 +103,7 @@ int main(int argc, char** argv)
     std::vector<uint8_t> image;
 
     //*
-    uint32_t error = lodepng::decode(image, width, height, "asset.png");
+    uint32_t error = lodepng::decode(image, width, height, "assets/asset.png");
     if(error) {
         std::cout << "decoder error " << error << ": " << lodepng_error_text(error) << std::endl;
     }
