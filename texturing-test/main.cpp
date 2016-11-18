@@ -7,7 +7,7 @@
 #include <GLFW/glfw3.h>
 
 #include "lodepng.h"
-#include "Shader.h"
+#include "shader.h"
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
     }
 
     // shader
-    Shader s("vert.glsl", "frag.glsl");
+    Shader s("assets/vert.glsl", "assets/frag.glsl");
     if(!s.compile()) {
         std::cout << "Some error happened while creating shaders\n";
         return -1;
