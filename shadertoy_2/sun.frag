@@ -1,7 +1,8 @@
 #version 430
 
-uniform float iGlobalTime;
-uniform vec2 iResolution;
+uniform vec3      iResolution;           // viewport resolution (in pixels)
+uniform float     iGlobalTime;           // shader playback time (in seconds)
+uniform vec4      iMouse;                // mouse pixel coords. xy: current (if MLB down), zw: click
 in vec2 TexCoord;
 out vec4 outColor;
 uniform sampler2D textureData;
@@ -210,11 +211,10 @@ float sphereZero(vec3 ray,vec3 pos,float r)
     return s;
 }
 
-vec4 iMouse = vec4(300.0, 300.0, 0.0, 0.0);
-vec4 fragColor;
 //void mainImage( out vec4 fragColor, in vec2 fragCoord )
 void main()
 {
+    vec4 fragColor;
     vec2 p = (-iResolution.xy + 2.0*gl_FragCoord.xy) / iResolution.y;
 
     float time=iGlobalTime*1.0;

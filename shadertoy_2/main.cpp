@@ -51,6 +51,11 @@ int main(int argc, char** argv)
         return -1;
     }
 
+    GLuint VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    // load in vertex data
     float vertices[] = {
           /* position */     /* texcoords */
         -1.0, -1.0, 0.0,    0.0, 0.0,
@@ -58,17 +63,6 @@ int main(int argc, char** argv)
         1.0, 1.0, 0.0,      1.0, 1.0,
         -1.0, 1.0, 0.0,     0.0, 1.0,
     };
-
-    GLuint vertex_indices[] = {
-        0, 1, 2,
-        2, 3, 0,
-    };
-
-    GLuint VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
-    // load in vertex data
     GLuint VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -82,16 +76,25 @@ int main(int argc, char** argv)
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
     glEnableVertexAttribArray(1);
 
+    // load in index data
+    GLuint vertex_indices[] = {
+        0, 1, 2,
+        2, 3, 0,
+    };
     GLuint EBO;
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(vertex_indices), vertex_indices, GL_STATIC_DRAW);
 
+    // get uniform locations
     GLint textureDataSamplerLoc = glGetUniformLocation(s.getShaderProgram(), "textureData");
-    GLint timeUniformLoc = glGetUniformLocation(s.getShaderProgram(), "iGlobalTime");
     GLint iResolutionUniformLoc = glGetUniformLocation(s.getShaderProgram(), "iResolution");
+    GLint iGlobalTimeLoc = glGetUniformLocation(s.getShaderProgram(), "iGlobalTime");
+    GLint iMouseUniformLoc = glGetUniformLocation(s.getShaderProgram(), "iMouse");
 
     // main loop
+    double mouseX, mouseY, mouseZ, mouseW;
+    mouseX = mouseY = mouseZ = mouseW = 0.0;
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -100,8 +103,15 @@ int main(int argc, char** argv)
 
         // set uniforms
         glUniform1i(textureDataSamplerLoc, 0);
-        glUniform1f(timeUniformLoc, (float)glfwGetTime() + 5.0f);
-        glUniform2f(iResolutionUniformLoc, (float)width, (float)height);
+        glUniform3f(iResolutionUniformLoc, (float)width, (float)height, 0.0f);
+        glUniform1f(iGlobalTimeLoc, (float)glfwGetTime() + 5.0f);
+
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS
+            || glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+            mouseZ = 1.0f;
+            glfwGetCursorPos(window, &mouseX, &mouseY);
+        }
+        glUniform4f(iMouseUniformLoc, (float)mouseX, (float)mouseY, (float)mouseZ, (float)mouseW);
 
         // Draw container
         glBindVertexArray(VAO);
