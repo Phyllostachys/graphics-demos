@@ -8,10 +8,8 @@ A repo to store and showcase any graphics demos that I make.
 - [glm](https://github.com/g-truc/glm) - for some sweet GLSL maths
 
 ### Build ###
-To build, run in Windows cmd or *nix shell:
-```shell
-mkdir build
-cd build
-cmake ../
+It used to be easy because I used cmake but that is in flux now... Many folders have windows build scripts, anything else probably doesn't work anymore but the programs are only a few C or C++ files so they can be hand compiled with cl.exe or g++:
 ```
-From there, run either `make` or open Visual Studios to compile.
+g++ -Wall some_file.cpp -o some_file # add in libraries as needed.
+```
+TODO: Fixup build instructions. :-/
