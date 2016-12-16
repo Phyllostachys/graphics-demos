@@ -25,18 +25,24 @@ int main(int argc, char** argv)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     int width, height;
+    GLFWwindow *window;
 #define FULLSCREEN 0
 #if FULLSCREEN
     width = 1920;
     height = 1080;
+    window = glfwCreateWindow(width, height, "Shadertoy Screensaver", glfwGetPrimaryMonitor(), nullptr);
 #else
     width = 800;
     height = 600;
+    window = glfwCreateWindow(width, height, "Shadertoy Screensaver", nullptr, nullptr);
 #endif
 
-    GLFWwindow* window = glfwCreateWindow(width, height, "Texture Test", nullptr, nullptr);
     glfwMakeContextCurrent(window);
     glfwSetKeyCallback(window, key_callback);
+
+    int count = 0;
+    glfwGetMonitors(&count);
+    std::cout << "Number of monitors: " << count << "\n";
 
     // Load in OGL functions
     if (!gladLoadGL()) {
@@ -44,8 +50,14 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    // shader
-    Shader s("simple.vert", "sun.frag");
+    // Check if we are uses a default shader or a passed in shader
+    std::string shadertoyShaderPath("shaders/hexes.frag");
+    std::cout << "argc: " << argc << "\n";
+    if (argc > 1) {
+        shadertoyShaderPath = argv[1];
+    }
+    std::cout << "Using shader path: " << shadertoyShaderPath << "\n";
+    Shader s("shaders/simple.vert", shadertoyShaderPath);
     if(!s.compile()) {
         std::cout << "Some error happened while creating shaders\n";
         return -1;

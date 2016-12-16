@@ -1,13 +1,14 @@
 #version 430
 
-const float v = 151.0;
-const float r = 32.0;
-
-uniform float time;
-uniform vec2 iResolution;
+uniform vec3      iResolution;           // viewport resolution (in pixels)
+uniform float     iGlobalTime;           // shader playback time (in seconds)
+uniform vec4      iMouse;                // mouse pixel coords. xy: current (if MLB down), zw: click
 in vec2 TexCoord;
 out vec4 outColor;
 uniform sampler2D textureData;
+
+const float v = 151.0;
+const float r = 32.0;
 
 vec4 hexagon(in vec2 p)
 {
@@ -26,7 +27,7 @@ vec4 hexagon(in vec2 p)
 float URA(in vec2 p)
 {
 #ifdef INCREMENT_R
-    float l = mod(p.y + floor(time*1.5)*p.x, v);
+    float l = mod(p.y + floor(iGlobalTime*1.5)*p.x, v);
 #else
     float l = mod(p.y + r*p.x, v);
 #endif
