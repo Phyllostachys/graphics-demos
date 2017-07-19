@@ -1,12 +1,17 @@
-#include "Image.h"
+//#include "Image.h"
 
-#include <iostream>
-#include <fstream>
+//#include <cmath>
 #include <cstdint>
 #include <cstdlib>
-#include <cmath>
 #include <ctime>
-#include <string>
+//#include <fstream>
+#include <iostream>
+//#include <string>
+
+#include "texture.h"
+
+#define SDL_MAIN_HANDLED
+#include "SDL2/SDL.h"
 
 #define stringify(thing) #thing
 
@@ -14,23 +19,20 @@
 #define PPM_GREEN_PIXEL "107 142 35 "
 #define PPM_BROWN_PIXEL "135 74 43 "
 
-enum {
-    pxl_black = 0,
-    pxl_green,
-    pxl_brown
-};
+enum { pxl_black = 0, pxl_green, pxl_brown };
 
-Color enumToColor(uint8_t e)
-{
+Color enumToColor(uint8_t e) {
     switch (e) {
-        default:        return {0,0,0};
-        case pxl_green: return {107, 142, 35};
-        case pxl_brown: return {135, 74, 43};
+        default:
+            return {0, 0, 0, 255};
+        case pxl_green:
+            return {107, 142, 35, 255};
+        case pxl_brown:
+            return {135, 74, 43, 255};
     }
 }
 
-uint8_t colorToEnum(Color c)
-{
+uint8_t colorToEnum(Color c) {
     if (c.red == 0 && c.green == 0 && c.blue == 0)
         return pxl_black;
     else if (c.red == 107 && c.green == 142 && c.blue == 35)
@@ -41,57 +43,51 @@ uint8_t colorToEnum(Color c)
     return pxl_black;
 }
 
-enum {
-    alg_linear,
-    alg_spiral
-} algorithm = alg_linear;
+enum { alg_linear, alg_spiral } algorithm = alg_linear;
 
-static int searchForSimilar(Image& i, int x, int y, uint8_t color)
-{
-    int result = 0;
+static uint32_t searchForSimilar(Texture &i, uint32_t x, uint32_t y, uint8_t color) {
+    uint32_t result = 0;
 
     // top
-    if (colorToEnum(i.getPixel(x - 1, y - 1)) == color) {
+    if (colorToEnum(i.get_pixel((x - 1) % i.width, (y - 1) % i.height)) == color) {
         result++;
     }
-    if (colorToEnum(i.getPixel(x, y - 1)) == color) {
+    if (colorToEnum(i.get_pixel(x, (y - 1) % i.height)) == color) {
         result++;
     }
-    if (colorToEnum(i.getPixel(x + 1, y - 1)) == color) {
+    if (colorToEnum(i.get_pixel((x + 1) % i.width, (y - 1) % i.height)) == color) {
         result++;
     }
 
     // left and right
-    if (colorToEnum(i.getPixel(x - 1, y)) == color) {
+    if (colorToEnum(i.get_pixel((x - 1) % i.width, y)) == color) {
         result++;
     }
-    if (colorToEnum(i.getPixel(x + 1, y)) == color) {
+    if (colorToEnum(i.get_pixel((x + 1) % i.width, y)) == color) {
         result++;
     }
 
     // bottom
-    if (colorToEnum(i.getPixel(x - 1, y + 1)) == color) {
+    if (colorToEnum(i.get_pixel((x - 1) % i.width, (y + 1) % i.height)) == color) {
         result++;
     }
-    if (colorToEnum(i.getPixel(x, y + 1)) == color) {
+    if (colorToEnum(i.get_pixel(x, (y + 1) % i.width)) == color) {
         result++;
     }
-    if (colorToEnum(i.getPixel(x - 1, y + 1)) == color) {
+    if (colorToEnum(i.get_pixel((x - 1) % i.width, (y + 1) % i.height)) == color) {
         result++;
     }
 
     return result;
 }
 
-struct SurroundCount
-{
-    int black;
-    int green;
-    int brown;
+struct SurroundCount {
+    uint32_t black;
+    uint32_t green;
+    uint32_t brown;
 };
 
-static SurroundCount getSurroundCounts(Image& i, int x, int y)
-{
+static SurroundCount getSurroundCounts(Texture &i, uint32_t x, uint32_t y) {
     SurroundCount ret;
     ret.black = searchForSimilar(i, x, y, pxl_black);
     ret.green = searchForSimilar(i, x, y, pxl_green);
@@ -99,8 +95,7 @@ static SurroundCount getSurroundCounts(Image& i, int x, int y)
     return ret;
 }
 
-static uint8_t sampleFanbase(Image& i, int x, int y, uint8_t color)
-{
+static uint8_t sampleFanbase(Texture &i, uint32_t x, uint32_t y, uint8_t color) {
     uint8_t newColor = pxl_black;
     SurroundCount surroundings = getSurroundCounts(i, x, y);
 
@@ -157,9 +152,8 @@ static uint8_t sampleFanbase(Image& i, int x, int y, uint8_t color)
     return newColor;
 }
 
-int main(int argc, char* argv[])
-{
-    int width = 20, height = 20;
+int main(int argc, char *argv[]) {
+    uint32_t width = 512, height = 512;
 
     if (argc == 3) {
         std::cout << "argc - " << argc << "\n";
@@ -170,24 +164,84 @@ int main(int argc, char* argv[])
 
         sscanf(argv[1], "%d", &width);
         sscanf(argv[2], "%d", &height);
-
-        if (width < 0) width *= -1;
-        if (height < 0) height *= -1;
     }
 
     // init data
     srand(time(NULL));
 
-    Image img{width, height};
+    if (SDL_Init(SDL_INIT_VIDEO)) {
+        std::cout << "Failed to init SDL2.\n";
+        return -1;
+    }
+
+    SDL_Window *w;
+    SDL_Renderer *r;
+    if (SDL_CreateWindowAndRenderer(width, height, 0, &w, &r)) {
+        std::cout << "Failed to create window and renderer.\n";
+        return -1;
+    }
+
+    Texture img(width, height);
 
     // init data
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            int randColor = rand() % 3;
-            img.setPixel(x, y, enumToColor(randColor));
+    for (uint32_t y = 0; y < height; y++) {
+        for (uint32_t x = 0; x < width; x++) {
+            uint32_t randColor = rand() % 3;
+            img.set_pixel(x, y, enumToColor(randColor));
         }
     }
 
+    SDL_Texture *drawTex = SDL_CreateTexture(r,
+                                             SDL_PIXELFORMAT_RGBA32,
+                                             SDL_TEXTUREACCESS_STREAMING,
+                                             width, height);
+
+    bool quit = false;
+    do {
+        SDL_Event e;
+        while(SDL_PollEvent(&e)) {
+            if (e.type == SDL_QUIT) {
+                quit = true;
+            } else if (e.type == SDL_KEYDOWN) {
+                quit = true;
+            } else if (e.type == SDL_WINDOWEVENT) {
+                if (e.window.event == SDL_WINDOWEVENT_CLOSE) {
+                    quit = true;
+                }
+            }
+        }
+
+        // clear screen
+        SDL_SetRenderDrawColor(r, 0, 0, 0, 0xFF);
+        SDL_RenderClear(r);
+
+//*
+        // update pattern
+        Texture temp(width, height);
+
+        for (uint32_t y = 0; y < height; y++) {
+            for (uint32_t x = 0; x < width; x++) {
+                uint8_t newColor =
+                    sampleFanbase(img, x, y, colorToEnum(img.get_pixel(x, y)));
+                temp.set_pixel(x, y, enumToColor(newColor));
+            }
+        }
+
+        for (uint32_t y = 0; y < height; y++) {
+            for (uint32_t x = 0; x < width; x++) {
+                img.set_pixel(x, y, temp.get_pixel(x,y));
+            }
+        }
+//*/
+        // update texture and draw on screen
+        SDL_UpdateTexture(drawTex, nullptr, reinterpret_cast<const void *>(img.data()), width*4);
+        SDL_RenderCopy(r, drawTex, nullptr, nullptr);
+        SDL_RenderPresent(r);
+    } while(!quit);
+    SDL_DestroyRenderer(r);
+    SDL_Quit();
+
+    /*
     ppmPrinter(img, "initial_colors.ppm");
 
     // do the thing
@@ -195,10 +249,11 @@ int main(int argc, char* argv[])
     do {
         Image temp{width, height};
 
-        for (int y = 1; y < height - 1; y++) {
-            for (int x = 1; x < width - 1; x++) {
-                uint8_t newColor = sampleFanbase(img, x, y, colorToEnum(img.getPixel(x,y)));
-                temp.setPixel(x, y, enumToColor(newColor));
+        for (int y = 0; y < height - 1; y++) {
+            for (int x = 0; x < width - 1; x++) {
+                uint8_t newColor =
+                    sampleFanbase(img, x, y, colorToEnum(img.get_pixel(x, y)));
+                temp.set_pixel(x, y, enumToColor(newColor));
             }
         }
 
@@ -222,14 +277,15 @@ int main(int argc, char* argv[])
 
         ppmPrinter(img, filename);
 
-        for (int y = height - 1; y > 1; y--) {
-            for (int x = width - 1; x > 1; x--) {
-                img.setPixel(x, y, temp.getPixel(x,y));
+        for (int y = height - 1; y >= 0; y--) {
+            for (int x = width - 1; x >= 0; x--) {
+                img.set_pixel(x, y, temp.get_pixel(x, y));
             }
         }
 
         iterations++;
-    } while (iterations <= 25);
+    } while (iterations <= 50);
+    */
 
     return 0;
 }

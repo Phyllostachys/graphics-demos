@@ -3,13 +3,11 @@ cmake_policy(VERSION 3.0)
 
 project(camo-generator)
 
+#include_directories("C:/Users/jacob.shaffer/.local/include")
 include_directories(src)
 
-if(UNIX OR MINGW)
-    add_compile_options("-Wall" "-std=c++11")
-    if(UNIX)
-        set(EXTRA_LIBS dl)
-    endif(UNIX)
-endif(UNIX OR MINGW)
+find_package(SDL2)
 
 add_executable(camo-generator src/main.cpp)
+target_link_libraries(camo-generator ${SDL_LIBS})
+#target_link_libraries(camo-generator C:/Users/jacob.shaffer/.local/lib/SDL2.lib)
