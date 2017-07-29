@@ -39,7 +39,7 @@ std::string frag_shader =
     out vec4 outColor;
 
     // Globals
-    vec3 light = vec3(800.0, 450.0, 100.0);
+    vec3 light = vec3(300.0, 600.0, 100.0);
 
     float intersect(vec3 ray, vec3 dir, vec3 center, float radius)
     {
@@ -63,10 +63,9 @@ std::string frag_shader =
     void main()
     {
         outColor = vec4(triangleColor, 1.0);
-        //vec3 spherePos = vec3(800.0, 450.0, -20.0);
-        //float sphereRadius = 175.0;
+
         light.x = light.x + 200 * sin(mod(time, 60.0) * 3.14);
-        light.y = light.y + 200 * cos(mod(time, 60.0) * 3.14);
+        light.y = 1.0; //light.y + 200 * cos(mod(time, 60.0) * 3.14);
         //light.z = light.z + 10 * sin(mod(time, 60.0) * 3.14);
 
         if (length(gl_FragCoord.xyz - spherePos1) > sphereRadius1 &&
@@ -96,15 +95,15 @@ std::string frag_shader =
             t = t3;
             spherePos = spherePos3;
         } else {
-            outColor = 0.5 * vec4(triangleColor, 1.0);
+            outColor = 0.5 * vec4(outColor);
             return;
         }
 
         vec3 intersectionPoint = rayOrigin + t * rayDir;
         vec3 sphereNormal = normalize(intersectionPoint - spherePos);
-        float intensity = dot(sphereNormal, intersectionPoint - light) * .2;
+        float intensity = dot(sphereNormal, light - intersectionPoint) * .7;
 
-        outColor = vec4((intensity / 100.0) * triangleColor, 1.0);
+        outColor = vec4(intensity * triangleColor, 1.0);
     }
     )***";
 
@@ -120,9 +119,9 @@ int main()
 
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-    GLFWwindow* window = glfwCreateWindow(1600, 900, "Ray Tracing Screensaver", glfwGetPrimaryMonitor(), nullptr);
+    GLFWwindow* window = glfwCreateWindow(600, 600, "Ray Tracing Screensaver", nullptr, nullptr);
     glfwMakeContextCurrent(window);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     std::default_random_engine rand(time(NULL));
 
@@ -142,11 +141,7 @@ int main()
     // generate vertex buffer object
     GLuint vbo;
     glGenBuffers(1, &vbo);
-
-    // make vbo the active buffer
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-    // copy vertices to active buffer
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     // vertex shader
@@ -219,13 +214,26 @@ int main()
     } color_inc_state = redUp;
 
     float spherePositions[3][3] = {
-        { (float)(rand() % 1300) + 149.0f, (float)(rand() % 600) + 149.0f, -20.0f },
-        { (float)(rand() % 1300) + 149.0f, (float)(rand() % 600) + 149.0f, -20.0f },
-        { (float)(rand() % 1300) + 149.0f, (float)(rand() % 600) + 149.0f, -20.0f }
+        { (float)(rand() % 400 + 100), (float)(rand() % 400 + 100), -20.f },
+        { (float)(rand() % 400 + 100), (float)(rand() % 400 + 100), -20.f },
+        { (float)(rand() % 400 + 100), (float)(rand() % 400 + 100), -20.f }
+        //{ 2.0f * (float)(rand()) / RAND_MAX - 1.0f, 2.0f * (float)(rand()) / RAND_MAX - 1.0f, -20.0f },
+        //{ 2.0f * (float)(rand()) / RAND_MAX - 1.0f, 2.0f * (float)(rand()) / RAND_MAX - 1.0f, -20.0f },
+        //{ 2.0f * (float)(rand()) / RAND_MAX - 1.0f, 2.0f * (float)(rand()) / RAND_MAX - 1.0f, -20.0f },
+        //{ (float)(rand() % 200 - 100) / 100.0f, (float)(rand() % 200 - 100) / 100.0f, -20.0f },
+        //{ (float)(rand() % 200 - 100) / 100.0f, (float)(rand() % 200 - 100) / 100.0f, -20.0f },
+        //{ (float)(rand() % 200 - 100) / 100.0f, (float)(rand() % 200 - 100) / 100.0f, -20.0f }
     };
 
+    for (int sphere = 0; sphere < 3; sphere++) {
+        std::cout << "Sphere " << sphere << ": <"
+                  << spherePositions[sphere][0] << ", "
+                  << spherePositions[sphere][1] << ", "
+                  << spherePositions[sphere][2] << ">\n";
+    }
+
     float sphereRadii[3] = {
-        (float)(rand() % 125) + 10.0f, (float)(rand() % 125) + 10.0f, (float)(rand() % 125) + 10.0f
+        (float)(rand() % 30) + 10.0f, (float)(rand() % 25) + 10.0f, (float)(rand() % 15) + 10.0f
     };
 
     uint32_t counter = 0;
@@ -238,9 +246,8 @@ int main()
         }
 
         if (glfwGetTime() - startTime > 0.032) {
-            std::cout << "Frame time: " << glfwGetTime() - startTime << std::endl;
+            //std::cout << "Frame time: " << glfwGetTime() - startTime << "\n";
             startTime = glfwGetTime();
-            std::cout << (float)(rand() % 125) << std::endl;
 
             switch (color_inc_state) {
                 case redUp:
@@ -302,29 +309,29 @@ int main()
             }
 
             if (counter >= 250) {
-                spherePositions[0][0] = (float)(rand() % 1300) + 149.0f;
-                spherePositions[1][0] = (float)(rand() % 1300) + 149.0f;
-                spherePositions[2][0] = (float)(rand() % 1300) + 149.0f;
-                spherePositions[0][1] = (float)(rand() % 600) + 149.0f;
-                spherePositions[1][1] = (float)(rand() % 600) + 149.0f;
-                spherePositions[2][1] = (float)(rand() % 600) + 149.0f;
+                spherePositions[0][0] = (float)(rand() % 600) / 1200.0f;
+                spherePositions[1][0] = (float)(rand() % 600) / 1200.0f;
+                spherePositions[2][0] = (float)(rand() % 600) / 1200.0f;
+                spherePositions[0][1] = (float)(rand() % 600) / 1200.0f;
+                spherePositions[1][1] = (float)(rand() % 600) / 1200.0f;
+                spherePositions[2][1] = (float)(rand() % 600) / 1200.0f;
                 spherePositions[0][2] = -20.0f;
                 spherePositions[1][2] = -20.0f;
                 spherePositions[2][2] = -20.0f;
 
-                sphereRadii[0] = (float)(rand() % 125) + 10.0f;
-                sphereRadii[1] = (float)(rand() % 125) + 10.0f;
-                sphereRadii[2] = (float)(rand() % 125) + 10.0f;
+                sphereRadii[0] = (float)(rand() % 35) + 10.0f;
+                sphereRadii[1] = (float)(rand() % 25) + 10.0f;
+                sphereRadii[2] = (float)(rand() % 15) + 10.0f;
 
                 counter = 0;
             }
 
             // rendering
             //// make vbo the active buffer
-            glBindBuffer(GL_ARRAY_BUFFER, vbo);
+            //glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
             //// copy vertices to active buffer
-            glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+            //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
             glUseProgram(shaderProgram);
 
@@ -334,11 +341,11 @@ int main()
             // Set Uniforms
             glUniform3f(uniColor, (float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f);
             glUniform1f(time, (float)glfwGetTime());
-            glUniform3f(spherePos1, spherePositions[0][0], spherePositions[0][1], spherePositions[0][2]);
+            glUniform3f(spherePos1, spherePositions[0][0], spherePositions[1][0], spherePositions[2][0]);
             glUniform1f(sphereRadius1, sphereRadii[0]);
-            glUniform3f(spherePos2, spherePositions[1][0], spherePositions[1][1], spherePositions[1][2]);
+            glUniform3f(spherePos2, spherePositions[0][1], spherePositions[1][1], spherePositions[2][1]);
             glUniform1f(sphereRadius2, sphereRadii[1]);
-            glUniform3f(spherePos3, spherePositions[2][0], spherePositions[2][1], spherePositions[2][2]);
+            glUniform3f(spherePos3, spherePositions[0][2], spherePositions[1][2], spherePositions[2][2]);
             glUniform1f(sphereRadius3, sphereRadii[2]);
 
             glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
