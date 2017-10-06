@@ -176,7 +176,7 @@ int main(int argc, char *argv[]) {
 
     SDL_Window *w;
     SDL_Renderer *r;
-    if (SDL_CreateWindowAndRenderer(width, height, 0, &w, &r)) {
+    if (SDL_CreateWindowAndRenderer(width, height, SDL_WINDOW_RESIZABLE, &w, &r)) {
         std::cout << "Failed to create window and renderer.\n";
         return -1;
     }
@@ -196,6 +196,7 @@ int main(int argc, char *argv[]) {
                                              SDL_TEXTUREACCESS_STREAMING,
                                              width, height);
 
+    bool randomize = false;
     bool quit = false;
     do {
         SDL_Event e;
@@ -203,10 +204,25 @@ int main(int argc, char *argv[]) {
             if (e.type == SDL_QUIT) {
                 quit = true;
             } else if (e.type == SDL_KEYDOWN) {
-                quit = true;
+                if (e.key.keysym.sym == SDLK_r) {
+                    randomize = true;
+                } else {
+                    quit = true;
+                }
             } else if (e.type == SDL_WINDOWEVENT) {
                 if (e.window.event == SDL_WINDOWEVENT_CLOSE) {
                     quit = true;
+                }
+            }
+        }
+
+        if (randomize) {
+            randomize = false;
+
+            for (uint32_t y = 0; y < height; y++) {
+                for (uint32_t x = 0; x < width; x++) {
+                    uint32_t randColor = rand() % 3;
+                    img.set_pixel(x, y, enumToColor(randColor));
                 }
             }
         }
