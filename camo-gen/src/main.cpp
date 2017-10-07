@@ -21,14 +21,18 @@
 
 enum { pxl_black = 0, pxl_green, pxl_brown };
 
+Color first{0, 0, 0, 255};
+Color second{107, 142, 35, 255};
+Color third{135, 74, 43, 255};
+
 Color enumToColor(uint8_t e) {
     switch (e) {
         default:
-            return {0, 0, 0, 255};
+            return first;
         case pxl_green:
-            return {107, 142, 35, 255};
+            return second;
         case pxl_brown:
-            return {135, 74, 43, 255};
+            return third;
     }
 }
 
@@ -48,33 +52,43 @@ enum { alg_linear, alg_spiral } algorithm = alg_linear;
 static uint32_t searchForSimilar(Texture &i, uint32_t x, uint32_t y, uint8_t color) {
     uint32_t result = 0;
 
+    uint32_t left = x - 1,
+             right = x + 1,
+             top = y - 1,
+             bottom = y + 1;
+
+    if (x == 0) left = i.width - 1;
+    if (x == i.width) right = 0;
+    if (y == 0) top = i.height - 1;
+    if (y == i.height) bottom = 0;
+
     // top
-    if (colorToEnum(i.get_pixel((x - 1) % i.width, (y - 1) % i.height)) == color) {
+    if (colorToEnum(i.get_pixel(left, top)) == color) {
         result++;
     }
-    if (colorToEnum(i.get_pixel(x, (y - 1) % i.height)) == color) {
+    if (colorToEnum(i.get_pixel(x, top)) == color) {
         result++;
     }
-    if (colorToEnum(i.get_pixel((x + 1) % i.width, (y - 1) % i.height)) == color) {
+    if (colorToEnum(i.get_pixel(right, top)) == color) {
         result++;
     }
 
     // left and right
-    if (colorToEnum(i.get_pixel((x - 1) % i.width, y)) == color) {
+    if (colorToEnum(i.get_pixel(left, y)) == color) {
         result++;
     }
-    if (colorToEnum(i.get_pixel((x + 1) % i.width, y)) == color) {
+    if (colorToEnum(i.get_pixel(right, y)) == color) {
         result++;
     }
 
     // bottom
-    if (colorToEnum(i.get_pixel((x - 1) % i.width, (y + 1) % i.height)) == color) {
+    if (colorToEnum(i.get_pixel(left, bottom)) == color) {
         result++;
     }
-    if (colorToEnum(i.get_pixel(x, (y + 1) % i.width)) == color) {
+    if (colorToEnum(i.get_pixel(x, bottom)) == color) {
         result++;
     }
-    if (colorToEnum(i.get_pixel((x - 1) % i.width, (y + 1) % i.height)) == color) {
+    if (colorToEnum(i.get_pixel(right, bottom)) == color) {
         result++;
     }
 
@@ -152,19 +166,26 @@ static uint8_t sampleFanbase(Texture &i, uint32_t x, uint32_t y, uint8_t color) 
     return newColor;
 }
 
+void parse(char **args, uint32_t &width, uint32_t &height, uint32_t &twidth, uint32_t &theight) {
+    sscanf(args[1], "%d", &width);
+    sscanf(args[2], "%d", &height);
+
+    double aspect_ratio = (double)width / (double)height;
+    theight = (double)height / 2.5;
+    twidth = theight * aspect_ratio;
+}
+
 int main(int argc, char *argv[]) {
-    uint32_t width = 512, height = 512;
+    uint32_t width = 800, height = 600;
+    uint32_t tex_width = 300, tex_height = 225;
 
     if (argc == 3) {
-        std::cout << "argc - " << argc << "\n";
-
-        for (int i = 1; i < argc; i++) {
-            std::cout << "argv[" << i << "] - " << argv[i] << "\n";
-        }
-
-        sscanf(argv[1], "%d", &width);
-        sscanf(argv[2], "%d", &height);
+        printf("argc: %d\n", argc);
+        parse(argv, width, height, tex_width, tex_height);
     }
+
+    printf("Width: %d  Height: %d  Texture Width: %d  Texture Height: %d\n",
+        width, height, tex_width, tex_height);
 
     // init data
     srand(time(NULL));
@@ -181,11 +202,11 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    Texture img(width, height);
+    Texture img(tex_width, tex_height);
 
     // init data
-    for (uint32_t y = 0; y < height; y++) {
-        for (uint32_t x = 0; x < width; x++) {
+    for (uint32_t y = 0; y < tex_height; y++) {
+        for (uint32_t x = 0; x < tex_width; x++) {
             uint32_t randColor = rand() % 3;
             img.set_pixel(x, y, enumToColor(randColor));
         }
@@ -194,9 +215,10 @@ int main(int argc, char *argv[]) {
     SDL_Texture *drawTex = SDL_CreateTexture(r,
                                              SDL_PIXELFORMAT_RGBA32,
                                              SDL_TEXTUREACCESS_STREAMING,
-                                             width, height);
+                                             tex_width, tex_height);
 
-    bool randomize = false;
+    bool regen = false;
+    bool colorize = false;
     bool quit = false;
     do {
         SDL_Event e;
@@ -205,7 +227,9 @@ int main(int argc, char *argv[]) {
                 quit = true;
             } else if (e.type == SDL_KEYDOWN) {
                 if (e.key.keysym.sym == SDLK_r) {
-                    randomize = true;
+                    regen = true;
+                } else if (e.key.keysym.sym == SDLK_c) {
+                    //colorize = true;
                 } else {
                     quit = true;
                 }
@@ -216,11 +240,26 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        if (randomize) {
-            randomize = false;
+        if (colorize) {
+            colorize = false;
+            first.red = rand() % 255;
+            first.green = rand() % 255;
+            first.blue = rand() % 255;
 
-            for (uint32_t y = 0; y < height; y++) {
-                for (uint32_t x = 0; x < width; x++) {
+            second.red = rand() % 255;
+            second.green = rand() % 255;
+            second.blue = rand() % 255;
+
+            third.red = rand() % 255;
+            third.green = rand() % 255;
+            third.blue = rand() % 255;
+        }
+
+        if (regen) {
+            regen = false;
+
+            for (uint32_t y = 0; y < tex_height; y++) {
+                for (uint32_t x = 0; x < tex_width; x++) {
                     uint32_t randColor = rand() % 3;
                     img.set_pixel(x, y, enumToColor(randColor));
                 }
@@ -233,75 +272,30 @@ int main(int argc, char *argv[]) {
 
 //*
         // update pattern
-        Texture temp(width, height);
+        Texture temp(tex_width, tex_height);
 
-        for (uint32_t y = 0; y < height; y++) {
-            for (uint32_t x = 0; x < width; x++) {
+        for (uint32_t y = 0; y < tex_height; y++) {
+            for (uint32_t x = 0; x < tex_width; x++) {
                 uint8_t newColor =
                     sampleFanbase(img, x, y, colorToEnum(img.get_pixel(x, y)));
                 temp.set_pixel(x, y, enumToColor(newColor));
             }
         }
 
-        for (uint32_t y = 0; y < height; y++) {
-            for (uint32_t x = 0; x < width; x++) {
+        for (uint32_t y = 0; y < tex_height; y++) {
+            for (uint32_t x = 0; x < tex_width; x++) {
                 img.set_pixel(x, y, temp.get_pixel(x,y));
             }
         }
 //*/
         // update texture and draw on screen
-        SDL_UpdateTexture(drawTex, nullptr, reinterpret_cast<const void *>(img.data()), width*4);
+        SDL_UpdateTexture(drawTex, nullptr, reinterpret_cast<const void *>(img.data()), tex_width*4);
         SDL_RenderCopy(r, drawTex, nullptr, nullptr);
         SDL_RenderPresent(r);
     } while(!quit);
+
+    SDL_DestroyTexture(drawTex);
     SDL_DestroyRenderer(r);
     SDL_Quit();
-
-    /*
-    ppmPrinter(img, "initial_colors.ppm");
-
-    // do the thing
-    int iterations = 0;
-    do {
-        Image temp{width, height};
-
-        for (int y = 0; y < height - 1; y++) {
-            for (int x = 0; x < width - 1; x++) {
-                uint8_t newColor =
-                    sampleFanbase(img, x, y, colorToEnum(img.get_pixel(x, y)));
-                temp.set_pixel(x, y, enumToColor(newColor));
-            }
-        }
-
-        std::string filename;
-        if (algorithm == alg_linear) {
-            filename += stringify(alg_linear);
-        } else if (algorithm == alg_spiral) {
-            filename += stringify(alg_spiral);
-        }
-
-        filename += "_result_";
-
-        if (iterations > 9) {
-            filename += std::to_string(iterations);
-        } else {
-            filename += "0";
-            filename += std::to_string(iterations);
-        }
-
-        filename += "_itr.ppm";
-
-        ppmPrinter(img, filename);
-
-        for (int y = height - 1; y >= 0; y--) {
-            for (int x = width - 1; x >= 0; x--) {
-                img.set_pixel(x, y, temp.get_pixel(x, y));
-            }
-        }
-
-        iterations++;
-    } while (iterations <= 50);
-    */
-
     return 0;
 }
