@@ -167,19 +167,23 @@ static uint8_t sampleFanbase(Texture &i, uint32_t x, uint32_t y, uint8_t color) 
 }
 
 void parse(char **args, uint32_t &width, uint32_t &height, uint32_t &twidth, uint32_t &theight) {
-    sscanf(args[1], "%d", &width);
-    sscanf(args[2], "%d", &height);
-
-    double aspect_ratio = (double)width / (double)height;
-    theight = (double)height / 2.5;
-    twidth = theight * aspect_ratio;
+    printf("args[1]: %s\n", args[1]); sscanf(args[1], "%d", &width);
+    printf("args[2]: %s\n", args[2]); sscanf(args[2], "%d", &height);
+    if (args[3] && args[4]) {
+        printf("args[3]: %s\n", args[3]); sscanf(args[3], "%d", &twidth);
+        printf("args[4]: %s\n", args[4]); sscanf(args[4], "%d", &theight);
+    } else {
+        double aspect_ratio = (double)width / (double)height;
+        theight = (double)height / 2.5;
+        twidth = theight * aspect_ratio;
+    }
 }
 
 int main(int argc, char *argv[]) {
     uint32_t width = 800, height = 600;
     uint32_t tex_width = 300, tex_height = 225;
 
-    if (argc == 3) {
+    if (argc > 1) {
         printf("argc: %d\n", argc);
         parse(argv, width, height, tex_width, tex_height);
     }
@@ -219,6 +223,7 @@ int main(int argc, char *argv[]) {
 
     bool regen = false;
     bool colorize = false;
+    bool start = false;
     bool quit = false;
     do {
         SDL_Event e;
@@ -230,6 +235,8 @@ int main(int argc, char *argv[]) {
                     regen = true;
                 } else if (e.key.keysym.sym == SDLK_c) {
                     //colorize = true;
+                } else if (e.key.keysym.sym == SDLK_s) {
+                    start = true;
                 } else {
                     quit = true;
                 }
@@ -270,24 +277,25 @@ int main(int argc, char *argv[]) {
         SDL_SetRenderDrawColor(r, 0, 0, 0, 0xFF);
         SDL_RenderClear(r);
 
-//*
         // update pattern
-        Texture temp(tex_width, tex_height);
+        if (start) {
+            Texture temp(tex_width, tex_height);
 
-        for (uint32_t y = 0; y < tex_height; y++) {
-            for (uint32_t x = 0; x < tex_width; x++) {
-                uint8_t newColor =
-                    sampleFanbase(img, x, y, colorToEnum(img.get_pixel(x, y)));
-                temp.set_pixel(x, y, enumToColor(newColor));
+            for (uint32_t y = 0; y < tex_height; y++) {
+                for (uint32_t x = 0; x < tex_width; x++) {
+                    uint8_t newColor =
+                        sampleFanbase(img, x, y, colorToEnum(img.get_pixel(x, y)));
+                    temp.set_pixel(x, y, enumToColor(newColor));
+                }
+            }
+
+            for (uint32_t y = 0; y < tex_height; y++) {
+                for (uint32_t x = 0; x < tex_width; x++) {
+                    img.set_pixel(x, y, temp.get_pixel(x,y));
+                }
             }
         }
 
-        for (uint32_t y = 0; y < tex_height; y++) {
-            for (uint32_t x = 0; x < tex_width; x++) {
-                img.set_pixel(x, y, temp.get_pixel(x,y));
-            }
-        }
-//*/
         // update texture and draw on screen
         SDL_UpdateTexture(drawTex, nullptr, reinterpret_cast<const void *>(img.data()), tex_width*4);
         SDL_RenderCopy(r, drawTex, nullptr, nullptr);
