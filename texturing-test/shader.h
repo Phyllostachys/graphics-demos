@@ -1,7 +1,6 @@
 #ifndef SHADER_H_
 #define SHADER_H_
 
-#include <iostream>
 #include <glad/glad.h>
 
 enum shader_type {
@@ -20,6 +19,8 @@ public:
     Shader(std::string vert_filename, std::string frag_filename);
     int32_t addShader(std::string src_filename, shader_type type);
     GLuint getShaderProgram();
+    void addFragHeader(std::string header);
+    void addFragFooter(std::string footer);
     bool compile();
 
 private:

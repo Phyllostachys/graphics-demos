@@ -14,17 +14,19 @@ static void readFile(std::string& dest, FILE* src)
     // get size of contents
     fseek(src, 0, SEEK_END);
     fileSize = ftell(src);
-    
+
     // use size of contents
     dest.reserve(fileSize);
-    fileBuf = new char[fileSize];
+    fileBuf = new char[fileSize+1];
 
     // get contents
     rewind(src);
     fread(fileBuf, sizeof(char), fileSize, src);
+    fileBuf[fileSize] = '\0';
 
     // assign contents and cleanup
-    dest.assign(fileBuf);
+    //dest.assign(fileBuf);
+    dest = std::string(fileBuf);
     delete[] fileBuf;
 }
 
@@ -100,6 +102,18 @@ static bool isShaderStatusGood(GLint shaderHandle, GLenum statusType, char error
     }
 }
 
+void Shader::addFragHeader(std::string header)
+{
+    std::string newFragString = header + fragSource;
+    fragSource = newFragString;
+}
+
+void Shader::addFragFooter(std::string footer)
+{
+    std::string newFragString = fragSource + footer;
+    fragSource = newFragString;
+}
+
 bool Shader::compile()
 {
     char buffer[1024];
@@ -114,7 +128,6 @@ bool Shader::compile()
     // check vertex shader compile status
     if (!isShaderStatusGood(vertShaderHandle, GL_COMPILE_STATUS, buffer)) {
         anyErrors = true;
-        //std::cout << buffer << std::endl;
         return false;
     }
 
@@ -131,7 +144,6 @@ bool Shader::compile()
     // check vertex shader compile status
     if (!isShaderStatusGood(fragShaderHandle, GL_COMPILE_STATUS, buffer)) {
         anyErrors = true;
-        //std::cout << buffer << std::endl;
         return false;
     }
 
@@ -149,12 +161,6 @@ bool Shader::compile()
     // remember that a call to glUseProgram will still need to be done
 
     // check program link status
-    /*if (!isShaderProgramStatusGood(shaderProgHandle, GL_LINK_STATUS, buffer)) {
-        anyErrors = true;
-        std::cout << buffer << std::endl;
-        return false;
-    }*/
-
     GLint status;
     glGetProgramiv(shaderProgHandle, GL_LINK_STATUS, &status);
     if (status == GL_FALSE) {
@@ -164,11 +170,13 @@ bool Shader::compile()
         glGetProgramInfoLog(shaderProgHandle, length, NULL, info);
         std::cout << "glLinkProgram failed: \n" << info << std::endl;
         delete [] info;
+
+        return false;
     }
-    //glDetachShader(shaderProgHandle, vertShaderHandle);
-    //glDetachShader(shaderProgHandle, fragShaderHandle);
-    //glDeleteShader(vertShaderHandle);
-    //glDeleteShader(fragShaderHandle);
+    glDetachShader(shaderProgHandle, vertShaderHandle);
+    glDetachShader(shaderProgHandle, fragShaderHandle);
+    glDeleteShader(vertShaderHandle);
+    glDeleteShader(fragShaderHandle);
 
     compiled = true;
     return true;

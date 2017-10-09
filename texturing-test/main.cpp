@@ -9,30 +9,30 @@
 #include "lodepng.h"
 #include "shader.h"
 
+void resize_callback(GLFWwindow *window, int width, int height);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
 int main(int argc, char** argv)
 {
     // Setup GLFW
-    glfwInit();
+    if (!glfwInit()) {
+        std::cout << "Failed to init GLFW.\n";
+        return -1;
+    }
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-#define FULLSCREEN 0
-#if FULLSCREEN
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Texture Test", glfwGetPrimaryMonitor(), nullptr);
-#else
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Texture Test", nullptr, nullptr);
-#endif
+    GLFWwindow* window = glfwCreateWindow(256, 256, "Texture Test", nullptr, nullptr);
     glfwMakeContextCurrent(window);
+    glfwSetWindowSizeCallback(window, resize_callback);
     glfwSetKeyCallback(window, key_callback);
 
     // Load in OGL functions
     if (!gladLoadGL()) {
-        std::cout << "Failed to initialize OpenGL context" << std::endl;
+        std::cout << "Failed to initialize OpenGL context\n";
         return -1;
     }
 
@@ -45,16 +45,10 @@ int main(int argc, char** argv)
 
     float vertices[] = {
           /* position */     /* texcoords */
-        -0.5, -0.5, 0.0,    0.0, 0.0,
-        0.5, -0.5, 0.0,     1.0, 0.0,
-        0.5, 0.5, 0.0,      1.0, 1.0,
-        -0.5, 0.5, 0.0,     0.0, 1.0,
-    };
-
-    float tex_coords[] = {
-        0.5, 0.2,
-        1.0, 1.0,
-        0.5, 0.8,
+        -0.75, -0.75, 0.0,    0.0, 0.0,
+        0.75, -0.75, 0.0,     1.0, 0.0,
+        0.75, 0.75, 0.0,      1.0, 1.0,
+        -0.75, 0.75, 0.0,     0.0, 1.0,
     };
 
     GLuint vertex_indices[] = {
@@ -104,7 +98,7 @@ int main(int argc, char** argv)
 
     //*
     uint32_t error = lodepng::decode(image, width, height, "assets/asset.png");
-    if(error) {
+    if (error) {
         std::cout << "decoder error " << error << ": " << lodepng_error_text(error) << std::endl;
     }
     //*/
@@ -169,6 +163,11 @@ int main(int argc, char** argv)
     glDeleteBuffers(1, &EBO);
     glfwTerminate();
     return 0;
+}
+
+void resize_callback(GLFWwindow *window, int width, int height)
+{
+    glViewport(0, 0, width, height);
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
