@@ -225,11 +225,53 @@ int main(int argc, char *argv[]) {
     bool colorize = false;
     bool start = false;
     bool quit = false;
+    bool mouse_down = false;
+    uint32_t mouse_down_color;
     do {
         SDL_Event e;
         while(SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
                 quit = true;
+            } else if (e.type == SDL_MOUSEBUTTONDOWN) {
+                mouse_down = true;
+                mouse_down_color = rand() % 3;
+            } else if (e.type == SDL_MOUSEBUTTONUP) {
+                mouse_down = false;
+            } else if (e.type == SDL_MOUSEMOTION && mouse_down == true) {
+                double x = (double)e.motion.x / (double)width;
+                double y = (double)e.motion.y / (double)height;
+
+                // ugly
+                img.set_pixel(tex_width * x - 2, tex_height * y - 2, enumToColor(mouse_down_color));
+                img.set_pixel(tex_width * x - 1, tex_height * y - 2, enumToColor(mouse_down_color));
+                img.set_pixel(tex_width * x    , tex_height * y - 2, enumToColor(mouse_down_color));
+                img.set_pixel(tex_width * x + 1, tex_height * y - 2, enumToColor(mouse_down_color));
+                img.set_pixel(tex_width * x + 2, tex_height * y - 2, enumToColor(mouse_down_color));
+
+                img.set_pixel(tex_width * x - 2, tex_height * y - 1, enumToColor(mouse_down_color));
+                img.set_pixel(tex_width * x - 1, tex_height * y - 1, enumToColor(mouse_down_color));
+                img.set_pixel(tex_width * x    , tex_height * y - 1, enumToColor(mouse_down_color));
+                img.set_pixel(tex_width * x + 1, tex_height * y - 1, enumToColor(mouse_down_color));
+                img.set_pixel(tex_width * x + 2, tex_height * y - 1, enumToColor(mouse_down_color));
+
+                img.set_pixel(tex_width * x - 2, tex_height * y    , enumToColor(mouse_down_color));
+                img.set_pixel(tex_width * x - 1, tex_height * y    , enumToColor(mouse_down_color));
+                img.set_pixel(tex_width * x    , tex_height * y    , enumToColor(mouse_down_color));
+                img.set_pixel(tex_width * x + 1, tex_height * y    , enumToColor(mouse_down_color));
+                img.set_pixel(tex_width * x + 2, tex_height * y    , enumToColor(mouse_down_color));
+
+                img.set_pixel(tex_width * x - 2, tex_height * y + 1, enumToColor(mouse_down_color));
+                img.set_pixel(tex_width * x - 1, tex_height * y + 1, enumToColor(mouse_down_color));
+                img.set_pixel(tex_width * x    , tex_height * y + 1, enumToColor(mouse_down_color));
+                img.set_pixel(tex_width * x + 1, tex_height * y + 1, enumToColor(mouse_down_color));
+                img.set_pixel(tex_width * x + 2, tex_height * y + 1, enumToColor(mouse_down_color));
+
+                img.set_pixel(tex_width * x - 2, tex_height * y + 2, enumToColor(mouse_down_color));
+                img.set_pixel(tex_width * x - 1, tex_height * y + 2, enumToColor(mouse_down_color));
+                img.set_pixel(tex_width * x    , tex_height * y + 2, enumToColor(mouse_down_color));
+                img.set_pixel(tex_width * x + 1, tex_height * y + 2, enumToColor(mouse_down_color));
+                img.set_pixel(tex_width * x + 2, tex_height * y + 2, enumToColor(mouse_down_color));
+
             } else if (e.type == SDL_KEYDOWN) {
                 if (e.key.keysym.sym == SDLK_r) {
                     regen = true;
