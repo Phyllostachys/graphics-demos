@@ -1,0 +1,15 @@
+[package]
+name = "camogen"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+rand = { version = "0.8" }
+wasm-bindgen = { version = "0.2.63", optional = true }
+getrandom = { version = "0.2", optional = true }
+
+[features]
+wasm = ["rand/getrandom", "getrandom/js", "wasm-bindgen"]

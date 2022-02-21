@@ -1,0 +1,10 @@
+[package]
+name = "camogen-demo"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+camogen = { version = "0.1.0", path = "../camogen" }
+structopt = "0.3"
+rand = "0.8"
+image = "0.23"
