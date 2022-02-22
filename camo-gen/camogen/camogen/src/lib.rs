@@ -3,7 +3,7 @@ pub use texture::{Color, Texture};
 
 use rand::{
     distributions::{Distribution, Uniform},
-    rngs::ThreadRng
+    rngs::ThreadRng,
 };
 
 #[derive(PartialEq, Eq, Debug)]
