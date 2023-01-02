@@ -15,7 +15,7 @@ pub struct Texture {
 impl Texture {
     pub fn new(width: usize, height: usize) -> Texture {
         let mut data = Vec::new();
-        data.resize((width * height * 4) as usize, 0);
+        data.resize(width * height * 4, 0);
         Texture {
             data_buffer: data,
             width,

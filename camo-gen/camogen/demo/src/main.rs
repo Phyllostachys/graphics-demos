@@ -158,6 +158,7 @@ fn main() -> PixResult<()> {
         .with_dimensions(progargs.twidth * 2, progargs.theight * 2)
         .with_title("CamogenDemo")
         .with_frame_rate()
+        .target_frame_rate(60)
         .resizable()
         .build()?;
     engine.run(&mut demo)
