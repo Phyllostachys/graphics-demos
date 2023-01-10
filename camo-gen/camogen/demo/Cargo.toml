@@ -7,8 +7,8 @@ edition = "2021"
 camogen = { version = "0.1.0", path = "../camogen" }
 structopt = "0.3"
 rand = "0.8"
-image = "0.23"
-pix-engine = { version = "0.5.4", features = ["vcpkg"] }
+image = "0.24.5"
+pix-engine = "0.6.0"
 
 [package.metadata.vcpkg]
 dependencies = ["sdl2", "sdl2-image[libjpeg-turbo,tiff,libwebp]", "sdl2-ttf", "sdl2-gfx", "sdl2-mixer"]
