@@ -128,10 +128,10 @@ fn get_surround_counts(i: &Texture, x: usize, y: usize) -> SurroundCount {
 fn search_for_similar(i: &Texture, x: usize, y: usize, color: Pixel) -> u32 {
     let mut result = 0;
 
-    let mut left = x.saturating_sub(1);
-    let mut right = x + 1;
-    let mut top = y.saturating_sub(1);
-    let mut bottom = y + 1;
+    let mut left = x.overflowing_sub(1).0 % i.width;
+    let mut right = (x + 1) % i.width;
+    let mut top = y.overflowing_sub(1).0 % i.height;
+    let mut bottom = (y + 1) % i.height;
 
     if x == 0 {
         left = i.width - 1;

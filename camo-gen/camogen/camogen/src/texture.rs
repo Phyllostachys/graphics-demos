@@ -24,7 +24,7 @@ impl Texture {
     }
 
     pub fn set_pixel(&mut self, x: usize, y: usize, c: Color) {
-        let mut offset = (y * (self.width * 4)) + (x * 4);
+        let mut offset = Texture::offset(x, y, self.width);
         if offset >= self.data_buffer.len() - 4 {
             offset = self.data_buffer.len() - 4;
         }
@@ -35,7 +35,7 @@ impl Texture {
     }
 
     pub fn get_pixel(&self, x: usize, y: usize) -> Color {
-        let mut offset = (y * (self.width * 4)) + (x * 4);
+        let mut offset = Texture::offset(x, y, self.width);
         if offset >= self.data_buffer.len() - 4 {
             offset = self.data_buffer.len() - 4;
         }
@@ -45,5 +45,9 @@ impl Texture {
             blue: self.data_buffer[offset + 2],
             alpha: self.data_buffer[offset + 3],
         }
+    }
+
+    fn offset(x: usize, y: usize, width: usize) -> usize {
+        (y * (width * 4)) + (x * 4)
     }
 }
