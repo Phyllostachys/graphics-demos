@@ -44,7 +44,7 @@ impl CamogenDemo {
     }
 }
 
-impl AppState for CamogenDemo {
+impl PixEngine for CamogenDemo {
     // Set up application state and initial settings. `PixState` contains
     // engine specific state and utility methods for actions like getting mouse
     // coordinates, drawing shapes, etc. (Optional)
@@ -154,10 +154,10 @@ fn main() -> PixResult<()> {
     // let height = progargs.height;
     let mut demo = CamogenDemo::new(progargs.twidth as usize, progargs.theight as usize);
 
-    let mut engine = PixEngine::builder()
-        .with_dimensions(progargs.twidth * 2, progargs.theight * 2)
-        .with_title("CamogenDemo")
-        .with_frame_rate()
+    let mut engine = Engine::builder()
+        .dimensions(progargs.twidth * 2, progargs.theight * 2)
+        .title("CamogenDemo")
+        .show_frame_rate()
         .target_frame_rate(60)
         .resizable()
         .build()?;
