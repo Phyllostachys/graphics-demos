@@ -2,6 +2,7 @@ use image::EncodableLayout;
 use pix_engine::prelude::*;
 use rand::distributions::{Distribution, Uniform};
 use rand::rngs::ThreadRng;
+use std::time::Instant;
 use structopt::StructOpt;
 
 #[derive(StructOpt)]
@@ -22,6 +23,7 @@ struct CamogenDemo {
     img: camogen::Texture,
     tid: TextureId,
     r: ThreadRng,
+    paint_color: Option<camogen::Color>,
 }
 
 impl CamogenDemo {
@@ -30,6 +32,7 @@ impl CamogenDemo {
             img: camogen::Texture::new(texture_width, texture_height),
             tid: TextureId::default(),
             r: rand::thread_rng(),
+            paint_color: None,
         }
     }
 
@@ -62,6 +65,7 @@ impl PixEngine for CamogenDemo {
     // Main update/render loop. Called as often as possible unless
     // `target_frame_rate` was set with a value. (Required)
     fn on_update(&mut self, s: &mut PixState) -> PixResult<()> {
+        let start = Instant::now();
         let mut gen_camo = true;
 
         if s.key_pressed() {
@@ -70,11 +74,24 @@ impl PixEngine for CamogenDemo {
             } else if s.key_down(Key::Q) {
                 s.close_window(s.window_id())?;
             }
-        } else if s.mouse_down(Mouse::Left) {
+        } else if s.mouse_down(Mouse::Left) || s.mouse_down(Mouse::Right) {
             let pos = s.mouse_pos();
             let x = (pos.x() as usize) >> 1;
             let y = (pos.y() as usize) >> 1;
-            let c = camogen::Color::from(random!(1, 4));
+
+            let c: camogen::Color;
+            if let Some(stored_color) = self.paint_color {
+                c = stored_color;
+            } else {
+                if s.mouse_down(Mouse::Left) {
+                    c = camogen::Color::from(random!(1, 4));
+                } else if s.mouse_down(Mouse::Right) {
+                    c = self.img.get_pixel(x, y);
+                } else {
+                    c = camogen::Color::from(camogen::Pixel::Black);
+                }
+                self.paint_color = Some(c);
+            }
 
             // println!("{x} {y} {c:?}");
 
@@ -109,6 +126,8 @@ impl PixEngine for CamogenDemo {
             self.img.set_pixel(x + 2, y + 2, c);
 
             gen_camo = false;
+        } else if self.paint_color.is_some() {
+            self.paint_color = None;
         }
 
         if gen_camo {
@@ -137,6 +156,9 @@ impl PixEngine for CamogenDemo {
             self.img.width * 4,
         )?;
         s.texture(self.tid, None, None)?;
+
+        let elapsed = start.elapsed();
+        println!("Update took {} ms", elapsed.as_millis());
 
         Ok(())
     }
