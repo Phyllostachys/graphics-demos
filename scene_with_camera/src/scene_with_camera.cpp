@@ -1,15 +1,15 @@
 #include "cube.h"
 #include "shader.h"
 
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
+//#include "glm/glm.hpp"
+//#include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
 #include <cstdio>
-#include <iostream>
+//#include <iostream>
 
 glm::vec3 cameraPos   = glm::vec3(0.0, 0.05, 23.0);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
