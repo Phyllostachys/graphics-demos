@@ -10,7 +10,9 @@ end
 
 target("scene_with_camera")
     set_kind("binary")
+    set_installdir(".")
     add_files("src/*.cpp")
+    add_installfiles("assets/*", {prefixdir = "bin/assets"})
 
 if is_os("windows") then
     add_packages("vcpkg::glad", "vcpkg::glfw3", "vcpkg::glm")
